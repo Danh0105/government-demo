@@ -1,6 +1,11 @@
-export const BASE_URL = import.meta.env.VITE_BASE_URL;
+export const BASE_URL = String(import.meta.env.VITE_API_BASE_URL || "").replace(
+    /\/+$/,
+    "",
+);
+
 export const MINI_APP_ID =
     window.APP_ID || (import.meta.env.VITE_MINI_APP_ID as string);
+
 export const API = {
     GET_ORGANIZATION: "/get_organization_api",
     SEARCH_PROFILES: "/search_profiles_api",
@@ -12,6 +17,7 @@ export const API = {
     CREATE_SCHEDULE: "/create_schedule_api",
     GET_SCHEDULE: "/get_schedule_api",
 };
+
 export const SEARCH_NOT_FOUND = "Không tìm thấy thông tin";
 
 export const TOTAL_ARTICLES_PER_PAGE = 10;

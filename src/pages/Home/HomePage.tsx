@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
 import Background from "@assets/background.png";
@@ -24,6 +24,12 @@ type Section = {
 type NavItem = FeatureItem & {
     active?: boolean;
     path?: string;
+};
+
+type ChatMessage = {
+    id: number;
+    role: "assistant" | "user";
+    content: string;
 };
 
 const featureSections: Section[] = [
@@ -59,16 +65,7 @@ const featureSections: Section[] = [
             { label: "Doanh nghiệp", icon: "zi-user", path: "/businesses" },
         ],
     },
-    {
-        title: "Du lịch số",
-        more: "Xem thêm",
-        items: [
-            { label: "Du lịch", icon: "zi-location", path: "/destinations" },
-            { label: "Nhà hàng", icon: "zi-more-grid", path: "/restaurants" },
-            { label: "Khách sạn", icon: "zi-home", path: "/hotels" },
-            { label: "Di chuyển", icon: "zi-call", path: "/transport" },
-        ],
-    },
+
     {
         title: "Thông tin số ",
         more: "Xem thêm",
@@ -79,6 +76,17 @@ const featureSections: Section[] = [
                 path: "/traffic-fines",
             },
             { label: "Truyền hình", icon: "zi-video", path: "/television" },
+        ],
+    },
+
+    {
+        title: "Du lịch số",
+        more: "Xem thêm",
+        items: [
+            { label: "Du lịch", icon: "zi-location", path: "/destinations" },
+            { label: "Nhà hàng", icon: "zi-more-grid", path: "/restaurants" },
+            { label: "Khách sạn", icon: "zi-home", path: "/hotels" },
+            { label: "Di chuyển", icon: "zi-call", path: "/transport" },
         ],
     },
 ];
@@ -156,7 +164,7 @@ const StyledPage = styled(Page)`
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         Helvetica, Arial, sans-serif;
 
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 400;
     line-height: 1.5;
 
@@ -220,7 +228,7 @@ const HeaderLogo = styled.div`
         inset: 2px 0 auto;
         text-align: center;
         color: #f7cf48;
-        font-size: 15px;
+        font-size: calc(15px * var(--app-font-scale));
         line-height: 1;
     }
 
@@ -243,7 +251,7 @@ const HeaderText = styled.div`
 `;
 
 const HeaderTitle = styled.div`
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     line-height: 1.15;
     font-weight: 800;
     letter-spacing: 0.2px;
@@ -253,7 +261,7 @@ const HeaderTitle = styled.div`
 const HeaderSubTitle = styled.div`
     margin-top: 5px;
 
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.3;
     font-weight: 500;
 
@@ -375,7 +383,7 @@ const HeroCopy = styled.div`
 const Script = styled.div`
     color: #ffe08a;
 
-    font-size: clamp(20px, 5.8vw, 27px);
+    font-size: clamp(18px, 5.2vw, 24px);
     line-height: 1.15;
     font-weight: 750;
     font-style: italic;
@@ -386,7 +394,7 @@ const HeroTitle = styled.div`
 
     color: #ffffff;
 
-    font-size: clamp(20px, 6vw, 28px);
+    font-size: clamp(18px, 5.4vw, 25px);
     line-height: 1.08;
     font-weight: 850;
     letter-spacing: -0.3px;
@@ -403,7 +411,7 @@ const HeroMeta = styled.div`
     color: #00558f;
     background: rgba(230, 247, 255, 0.92);
 
-    font-size: clamp(10px, 3vw, 12px);
+    font-size: clamp(9px, 2.7vw, 11px);
     line-height: 1.2;
     font-weight: 700;
 
@@ -484,7 +492,7 @@ const SectionHead = styled.div`
 
 const SectionTitle = styled.h2`
     margin: 0;
-    font-size: 25px;
+    font-size: calc(25px * var(--app-font-scale));
     line-height: 1.1;
     font-weight: 1000;
     color: #172033;
@@ -497,7 +505,7 @@ const MoreLink = styled.button`
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     font-weight: 850;
     white-space: nowrap;
 `;
@@ -564,7 +572,7 @@ const FeatureLabel = styled.span`
 
     color: #344054;
 
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.25;
     font-weight: 650;
     letter-spacing: -0.05px;
@@ -596,7 +604,7 @@ const BannerStrip = styled.div`
 
     color: #ffffff;
 
-    font-size: 19px;
+    font-size: calc(19px * var(--app-font-scale));
     line-height: 1.2;
     font-weight: 800;
     letter-spacing: 0.3px;
@@ -631,7 +639,7 @@ const Badge = styled.span`
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.86);
     padding: 8px 14px;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     font-weight: 800;
     color: #475467;
 `;
@@ -645,7 +653,7 @@ const CardTitle = styled.h3`
 
     color: #182230;
 
-    font-size: 19px;
+    font-size: calc(19px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 750;
     letter-spacing: -0.15px;
@@ -660,7 +668,7 @@ const MetaLine = styled.div`
 
     color: #667085;
 
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.4;
     font-weight: 450;
 `;
@@ -704,7 +712,7 @@ const GalleryBody = styled.div`
 const GalleryTitle = styled.div`
     color: #25324b;
 
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 700;
 
@@ -718,7 +726,7 @@ const GalleryCount = styled.div`
 
     color: #7b8494;
 
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.3;
     font-weight: 500;
 `;
@@ -746,7 +754,7 @@ const Status = styled.span`
     background: rgba(255, 255, 255, 0.62);
     color: #ffffff;
     padding: 6px 12px;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     font-weight: 900;
     backdrop-filter: blur(4px);
 `;
@@ -760,7 +768,7 @@ const EventTitle = styled.h3`
 
     color: #1d2939;
 
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 1.4;
     font-weight: 720;
 
@@ -799,7 +807,7 @@ const PolicyIcon = styled.div`
 const PolicyTitle = styled.div`
     color: #27364b;
 
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.45;
     font-weight: 700;
 `;
@@ -809,7 +817,7 @@ const PolicyMeta = styled.div`
 
     color: #7b8494;
 
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.5;
     font-weight: 450;
 `;
@@ -834,7 +842,7 @@ const RadioHeroTitle = styled.div`
     position: absolute;
     inset: auto 18px 20px;
     color: #ffffff;
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     line-height: 1.25;
     font-weight: 1000;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
@@ -851,7 +859,7 @@ const RadioRow = styled.div`
 
 const RadioNumber = styled.div`
     color: #e20018;
-    font-size: 24px;
+    font-size: calc(24px * var(--app-font-scale));
     font-weight: 1000;
 `;
 
@@ -865,7 +873,7 @@ const RadioThumb = styled.div`
 const RadioTitle = styled.div`
     color: #26364d;
 
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.4;
     font-weight: 700;
 `;
@@ -875,7 +883,7 @@ const RadioDate = styled.div`
 
     color: #7b8494;
 
-    font-size: 12px;
+    font-size: calc(12px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 500;
 `;
@@ -913,7 +921,7 @@ const AssistantLabel = styled.span`
     color: #005b9f;
     background: rgba(255, 255, 255, 0.94);
 
-    font-size: 12px;
+    font-size: calc(12px * var(--app-font-scale));
     line-height: 1;
     font-weight: 700;
 
@@ -942,6 +950,198 @@ const AssistantButton = styled.button`
     }
 `;
 
+const ChatBackdrop = styled.div`
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(15, 23, 42, 0.34);
+    backdrop-filter: blur(2px);
+`;
+
+const ChatPanel = styled.section`
+    position: fixed;
+    left: 50%;
+    right: auto;
+    bottom: calc(18px + var(--zaui-safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 50;
+
+    width: min(calc(100vw - 24px), 406px);
+    height: min(620px, calc(100vh - 42px));
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+
+    overflow: hidden;
+
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 24px 52px rgba(15, 23, 42, 0.26);
+`;
+
+const ChatHeader = styled.div`
+    min-height: 64px;
+    padding: 13px 14px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, #004b86, #008bd2);
+`;
+
+const ChatAvatar = styled.div`
+    width: 38px;
+    height: 38px;
+
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+`;
+
+const ChatHeading = styled.div`
+    flex: 1;
+    min-width: 0;
+`;
+
+const ChatTitle = styled.div`
+    font-size: calc(16px * var(--app-font-scale));
+    line-height: 1.25;
+    font-weight: 800;
+`;
+
+const ChatSubtitle = styled.div`
+    margin-top: 2px;
+
+    color: rgba(255, 255, 255, 0.78);
+
+    font-size: calc(12px * var(--app-font-scale));
+    line-height: 1.25;
+    font-weight: 500;
+`;
+
+const ChatCloseButton = styled.button`
+    width: 36px;
+    height: 36px;
+
+    border: 0;
+    border-radius: 50%;
+
+    display: grid;
+    place-items: center;
+
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+
+    &:active {
+        transform: scale(0.94);
+    }
+`;
+
+const ChatBody = styled.div`
+    min-height: 0;
+    padding: 14px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    overflow-y: auto;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef5fb 100%);
+`;
+
+const ChatBubble = styled.div<{ $role: ChatMessage["role"] }>`
+    max-width: 82%;
+    align-self: ${({ $role }) =>
+        $role === "user" ? "flex-end" : "flex-start"};
+
+    padding: 10px 12px;
+    border-radius: ${({ $role }) =>
+        $role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px"};
+
+    color: ${({ $role }) => ($role === "user" ? "#ffffff" : "#1d2939")};
+    background: ${({ $role }) => ($role === "user" ? "#0063a7" : "#ffffff")};
+
+    font-size: calc(14px * var(--app-font-scale));
+    line-height: 1.45;
+    font-weight: 500;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+`;
+
+const ChatError = styled.div`
+    margin: 0 14px 10px;
+
+    color: #b42318;
+
+    font-size: calc(12px * var(--app-font-scale));
+    line-height: 1.35;
+    font-weight: 650;
+`;
+
+const ChatForm = styled.form`
+    padding: 12px;
+
+    display: grid;
+    grid-template-columns: 1fr 44px;
+    gap: 8px;
+
+    border-top: 1px solid #e4e7ec;
+    background: #ffffff;
+`;
+
+const ChatInput = styled.textarea`
+    min-height: 44px;
+    max-height: 112px;
+    resize: none;
+
+    padding: 11px 12px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 16px;
+    outline: none;
+
+    color: #182230;
+    background: #ffffff;
+
+    font-size: calc(14px * var(--app-font-scale));
+    line-height: 1.35;
+    font-weight: 500;
+
+    &:focus {
+        border-color: #008bd2;
+        box-shadow: 0 0 0 3px rgba(0, 139, 210, 0.12);
+    }
+`;
+
+const ChatSendButton = styled.button`
+    width: 44px;
+    height: 44px;
+
+    border: 0;
+    border-radius: 50%;
+
+    display: grid;
+    place-items: center;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, #005b9f, #008bd2);
+
+    &:disabled {
+        opacity: 0.55;
+    }
+
+    &:active:not(:disabled) {
+        transform: scale(0.94);
+    }
+`;
+
 const BottomNav = styled.nav`
     position: fixed;
     inset: auto auto 0 50%;
@@ -962,43 +1162,57 @@ const BottomNav = styled.nav`
     backdrop-filter: blur(18px);
 `;
 
-const BottomNavLogo = styled.div`
+const BottomNavLogo = styled.div<{ $expanded?: boolean }>`
     position: absolute;
     left: 50%;
-    top: -38px;
+    top: ${({ $expanded }) => ($expanded ? "-48px" : "-30px")};
     transform: translateX(-50%);
     z-index: 3;
 
-    width: 128px;
-    height: 20px;
+    width: ${({ $expanded }) => ($expanded ? "150px" : "94px")};
+    height: ${({ $expanded }) => ($expanded ? "26px" : "16px")};
 
     display: grid;
     place-items: center;
 
-    padding: 7px 12px;
+    padding: ${({ $expanded }) => ($expanded ? "9px 15px" : "5px 10px")};
 
-    background: rgba(255, 255, 255, 0.98);
+    background: ${({ $expanded }) =>
+        $expanded ? "rgba(255, 255, 255, 1)" : "rgba(255, 255, 255, 0.94)"};
 
-    border: 1px solid rgba(0, 83, 145, 0.08);
+    border: 1px solid
+        ${({ $expanded }) =>
+            $expanded ? "rgba(0, 83, 145, 0.16)" : "rgba(0, 83, 145, 0.08)"};
     border-bottom: 0;
-    border-radius: 20px 20px 0 0;
+    border-radius: ${({ $expanded }) =>
+        $expanded ? "24px 24px 0 0" : "18px 18px 0 0"};
 
-    box-shadow: 0 -6px 16px rgba(0, 75, 134, 0.12);
+    box-shadow: ${({ $expanded }) =>
+        $expanded
+            ? "0 -12px 28px rgba(0, 75, 134, 0.22)"
+            : "0 -5px 14px rgba(0, 75, 134, 0.1)"};
+
+    transition: width 180ms ease, height 180ms ease, top 180ms ease,
+        padding 180ms ease, border-radius 180ms ease, box-shadow 180ms ease,
+        background 180ms ease;
 
     &::after {
         content: "";
         position: absolute;
         left: -1px;
         right: -1px;
-        bottom: -18px;
+        bottom: ${({ $expanded }) => ($expanded ? "-22px" : "-16px")};
 
-        height: 20px;
+        height: ${({ $expanded }) => ($expanded ? "24px" : "18px")};
 
-        background: rgba(255, 255, 255, 0.98);
+        background: ${({ $expanded }) =>
+            $expanded ? "rgba(255, 255, 255, 1)" : "rgba(255, 255, 255, 0.94)"};
+
+        transition: bottom 180ms ease, height 180ms ease, background 180ms ease;
     }
 `;
 
-const BottomNavLogoImage = styled.img`
+const BottomNavLogoImage = styled.img<{ $expanded?: boolean }>`
     position: relative;
     z-index: 1;
 
@@ -1007,6 +1221,11 @@ const BottomNavLogoImage = styled.img`
 
     display: block;
     object-fit: contain;
+    opacity: ${({ $expanded }) => ($expanded ? 1 : 0.86)};
+    filter: ${({ $expanded }) =>
+        $expanded ? "drop-shadow(0 2px 3px rgba(0, 75, 134, 0.16))" : "none"};
+
+    transition: opacity 180ms ease, filter 180ms ease;
 `;
 const NavButton = styled.button<{ $active?: boolean }>`
     position: relative;
@@ -1022,7 +1241,7 @@ const NavButton = styled.button<{ $active?: boolean }>`
 
     color: ${({ $active }) => ($active ? "#0063a7" : "#98a2b3")};
 
-    font-size: 11px;
+    font-size: calc(11px * var(--app-font-scale));
     line-height: 1.15;
     font-weight: ${({ $active }) => ($active ? 700 : 550)};
 
@@ -1050,8 +1269,149 @@ const ICON_SIZE = {
     nav: 23,
     floating: 25,
 } as const;
+
+const getAssistantAnswer = (data: any): string => {
+    if (typeof data === "string") {
+        return data;
+    }
+
+    const possibleAnswer =
+        data?.answer ??
+        data?.data?.answer ??
+        data?.data?.message ??
+        data?.message ??
+        data?.result ??
+        data?.content;
+
+    if (typeof possibleAnswer === "string") {
+        return possibleAnswer;
+    }
+
+    return "Xin lỗi, tôi chưa nhận được nội dung trả lời phù hợp.";
+};
+
 const HomePage: React.FunctionComponent = () => {
     const navigate = useNavigate();
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [chatInput, setChatInput] = useState("");
+    const [isSending, setIsSending] = useState(false);
+    const [chatError, setChatError] = useState("");
+    const [isCompanyLogoExpanded, setIsCompanyLogoExpanded] = useState(false);
+    const [messages, setMessages] = useState<ChatMessage[]>([
+        {
+            id: Date.now(),
+            role: "assistant",
+            content:
+                "Xin chào, tôi có thể hỗ trợ anh/chị tra cứu thủ tục hành chính.",
+        },
+    ]);
+    const messageIdRef = useRef(Date.now() + 1);
+
+    const nextMessageId = () => {
+        messageIdRef.current += 1;
+        return messageIdRef.current;
+    };
+
+    useEffect(() => {
+        let isExpanded = false;
+
+        const updateLogoByScroll = () => {
+            const pageElement = document.getElementById("home-page");
+            const nextExpanded =
+                window.scrollY > 24 || Number(pageElement?.scrollTop) > 24;
+
+            if (nextExpanded !== isExpanded) {
+                isExpanded = nextExpanded;
+                setIsCompanyLogoExpanded(nextExpanded);
+            }
+        };
+
+        updateLogoByScroll();
+        const intervalId = window.setInterval(updateLogoByScroll, 120);
+        window.addEventListener("scroll", updateLogoByScroll, {
+            passive: true,
+        });
+
+        return () => {
+            window.clearInterval(intervalId);
+            window.removeEventListener("scroll", updateLogoByScroll);
+        };
+    }, []);
+
+    const handleSendMessage = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        const question = chatInput.trim();
+        if (!question || isSending) {
+            return;
+        }
+
+        setChatInput("");
+        setChatError("");
+        setIsSending(true);
+        setMessages(current => [
+            ...current,
+            {
+                id: nextMessageId(),
+                role: "user",
+                content: question,
+            },
+        ]);
+
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), 30000);
+
+        try {
+            const response = await fetch(
+                "https://775f-2402-800-63a6-9a61-914b-905d-b0ba-d9f9.ngrok-free.app/chat/ask",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                    body: JSON.stringify({ question }),
+                    signal: controller.signal,
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error("Không thể kết nối trợ lý người dân.");
+            }
+
+            const data = await response.json();
+            setMessages(current => [
+                ...current,
+                {
+                    id: nextMessageId(),
+                    role: "assistant",
+                    content: getAssistantAnswer(data),
+                },
+            ]);
+        } catch (error) {
+            let message = "Có lỗi xảy ra khi gửi câu hỏi.";
+
+            if (error instanceof DOMException && error.name === "AbortError") {
+                message = "Trợ lý phản hồi quá lâu, vui lòng thử lại.";
+            } else if (error instanceof Error) {
+                message = error.message;
+            }
+
+            setChatError(message);
+            setMessages(current => [
+                ...current,
+                {
+                    id: nextMessageId(),
+                    role: "assistant",
+                    content:
+                        "Hiện chưa thể gửi câu hỏi. Anh/chị vui lòng thử lại sau.",
+                },
+            ]);
+        } finally {
+            window.clearTimeout(timeoutId);
+            setIsSending(false);
+        }
+    };
+
     return (
         <StyledPage id="home-page">
             <AppHeader>
@@ -1309,15 +1669,93 @@ const HomePage: React.FunctionComponent = () => {
 
                 <AssistantButton
                     aria-label="Mở trợ lý số"
-                    onClick={() => navigate("/assistant")}
+                    onClick={() => setIsChatOpen(true)}
                 >
                     <Icon icon="zi-chat" size={27} />
                 </AssistantButton>
             </FloatingActions>
 
+            {isChatOpen && (
+                <>
+                    <ChatBackdrop onClick={() => setIsChatOpen(false)} />
+                    <ChatPanel aria-label="Trợ lý người dân">
+                        <ChatHeader>
+                            <ChatAvatar>
+                                <Icon icon="zi-chat" size={24} />
+                            </ChatAvatar>
+                            <ChatHeading>
+                                <ChatTitle>Trợ lý người dân</ChatTitle>
+                                <ChatSubtitle>
+                                    Hỏi đáp thủ tục hành chính
+                                </ChatSubtitle>
+                            </ChatHeading>
+                            <ChatCloseButton
+                                aria-label="Đóng trợ lý"
+                                onClick={() => setIsChatOpen(false)}
+                            >
+                                <Icon icon="zi-close" size={22} />
+                            </ChatCloseButton>
+                        </ChatHeader>
+
+                        <ChatBody>
+                            {messages.map(message => (
+                                <ChatBubble
+                                    key={message.id}
+                                    $role={message.role}
+                                >
+                                    {message.content}
+                                </ChatBubble>
+                            ))}
+                            {isSending && (
+                                <ChatBubble $role="assistant">
+                                    Đang tìm câu trả lời...
+                                </ChatBubble>
+                            )}
+                        </ChatBody>
+
+                        <div>
+                            {chatError && <ChatError>{chatError}</ChatError>}
+                            <ChatForm onSubmit={handleSendMessage}>
+                                <ChatInput
+                                    value={chatInput}
+                                    placeholder="Nhập câu hỏi của anh/chị..."
+                                    rows={1}
+                                    onChange={event =>
+                                        setChatInput(event.target.value)
+                                    }
+                                    onKeyDown={event => {
+                                        if (
+                                            event.key === "Enter" &&
+                                            !event.shiftKey
+                                        ) {
+                                            event.preventDefault();
+                                            handleSendMessage(event);
+                                        }
+                                    }}
+                                />
+                                <ChatSendButton
+                                    type="submit"
+                                    aria-label="Gửi câu hỏi"
+                                    disabled={!chatInput.trim() || isSending}
+                                >
+                                    <Icon icon="zi-arrow-right" size={23} />
+                                </ChatSendButton>
+                            </ChatForm>
+                        </div>
+                    </ChatPanel>
+                </>
+            )}
+
             <BottomNav>
-                <BottomNavLogo aria-label="Logo công ty">
-                    <BottomNavLogoImage src={CompanyLogo} alt="Skill Trip X" />
+                <BottomNavLogo
+                    aria-label="Logo công ty"
+                    $expanded={isCompanyLogoExpanded}
+                >
+                    <BottomNavLogoImage
+                        src={CompanyLogo}
+                        alt="Logo công ty"
+                        $expanded={isCompanyLogoExpanded}
+                    />
                 </BottomNavLogo>
 
                 {navItems.map(item => (

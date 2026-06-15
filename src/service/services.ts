@@ -107,7 +107,7 @@ export interface GetFeedbacksParams {
 }
 export interface GetFeedbacksResponse {
     current: number;
-    data: (Omit<Feedback, "createdAt"> & { createdAt: number })[];
+    data: Feedback[];
     pageSize: number;
     total: number;
 }
@@ -139,11 +139,36 @@ export const getFeedbacks = async (
                 id: item.id,
                 title: item.title,
                 content: item.content,
-                response: item.response,
+                response: item.response || "",
+                receivingUnitId: item.receivingUnitId,
+                receivingUnitName: item.receivingUnitName,
+                senderFullName: item.senderFullName,
+                senderPhone: item.senderPhone,
+                senderEmail: item.senderEmail,
+                provideSenderAddress: item.provideSenderAddress,
+                senderAddress: item.senderAddress,
+                province: item.province,
+                district: item.district,
+                ward: item.ward,
+                addressDetail: item.addressDetail,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                occurredAt: item.occurredAt
+                    ? new Date(item.occurredAt)
+                    : undefined,
                 creationTime: new Date(item.creationTime),
-                responseTime: new Date(item.responseTime),
-                type: item.type,
+                responseTime: item.responseTime
+                    ? new Date(item.responseTime)
+                    : new Date(item.creationTime),
+                type: item.feedbackType?.title || item.type || "",
+                status: item.status,
+                isAnonymous: item.isAnonymous,
+                isPublic: item.isPublic,
+                isResultPublic: item.isResultPublic,
+                feedbackTypeId: item.feedbackTypeId,
+                feedbackType: item.feedbackType,
                 imageUrls: item.imageUrls,
+                attachmentUrls: item.attachmentUrls,
             })),
             page: data.current,
             total: data.total,
@@ -183,8 +208,26 @@ export interface CreateFeedbackParams {
     title: string;
     content: string;
     imageUrls?: string[];
-    feedbackTypeId: number;
-    token: string;
+    attachmentUrls?: string[];
+    feedbackTypeId: string;
+    token?: string;
+    receivingUnitId?: number;
+    receivingUnitName?: string;
+    senderFullName?: string;
+    senderPhone?: string;
+    senderEmail?: string;
+    provideSenderAddress?: boolean;
+    senderAddress?: string;
+    province?: string;
+    district?: string;
+    ward?: string;
+    addressDetail?: string;
+    latitude?: number;
+    longitude?: number;
+    occurredAt?: Date | string;
+    isAnonymous?: boolean;
+    isPublic?: boolean;
+    isResultPublic?: boolean;
 }
 
 export const createFeedback = async (

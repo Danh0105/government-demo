@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
 import Background from "@assets/background.png";
 import Thumb from "@assets/thumb.png";
+import HeaderPage from "@/components/layout/HeaderPage";
 
 type IndustrialZone = {
     name: string;
@@ -52,27 +53,6 @@ const PageWrapper = styled(Page)`
         sans-serif;
 `;
 
-const Header = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    transform: translateX(-50%);
-    width: min(100vw, 430px);
-    height: 96px;
-    z-index: 20;
-    padding: 26px 14px 16px;
-    color: #ffffff;
-    background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.12),
-            transparent 36%
-        ),
-        linear-gradient(120deg, #820712 0%, #ad0717 52%, #d31825 100%);
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    box-shadow: 0 10px 26px rgba(109, 7, 17, 0.18);
-`;
-
 const IconButton = styled.button`
     width: 48px;
     height: 48px;
@@ -89,24 +69,10 @@ const Title = styled.h1`
     margin: 0;
     flex: 1;
     min-width: 0;
-    font-size: 25px;
+    font-size: calc(25px * var(--app-font-scale));
     line-height: 1.08;
     font-weight: 950;
     white-space: nowrap;
-`;
-
-const Capsule = styled.div`
-    height: 44px;
-    width: 108px;
-    border-radius: 999px;
-    background: rgba(255, 245, 247, 0.86);
-    color: #151822;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    font-size: 27px;
-    font-weight: 750;
-    box-shadow: 0 10px 20px rgba(82, 3, 12, 0.2);
 `;
 
 const Content = styled.main`
@@ -153,7 +119,7 @@ const ZoneTop = styled.div`
 const ZoneName = styled.h2`
     margin: 0;
     color: #182132;
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     line-height: 1.32;
     font-weight: 950;
     display: -webkit-box;
@@ -183,7 +149,7 @@ const Badge = styled.span<{ $tone: "red" | "green" }>`
     padding: 0 11px;
     color: ${({ $tone }) => ($tone === "red" ? "#df1125" : "#15944d")};
     background: ${({ $tone }) => ($tone === "red" ? "#fde9ec" : "#eaf8ef")};
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 900;
     white-space: nowrap;
 `;
@@ -193,7 +159,7 @@ const Address = styled.div`
     align-items: flex-start;
     gap: 7px;
     color: #737b87;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 600;
 
@@ -208,7 +174,7 @@ const Address = styled.div`
 const TextLine = styled.div`
     margin-top: 12px;
     color: #737b87;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.32;
     font-weight: 600;
     display: -webkit-box;
@@ -229,7 +195,7 @@ const ProgressHeader = styled.div`
     gap: 12px;
     margin-top: 12px;
     color: #9aa0a8;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 1.2;
     font-weight: 700;
 `;
@@ -255,7 +221,7 @@ const ContactRow = styled.div`
     gap: 14px;
     flex-wrap: wrap;
     margin-top: 16px;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.2;
     font-weight: 700;
 `;
@@ -301,7 +267,7 @@ const IndustrialZonesPage: React.FC = () => {
 
     return (
         <PageWrapper id="industrial-zones-page">
-            <Header>
+            <HeaderPage>
                 <IconButton
                     aria-label="Quay lại"
                     onClick={() => navigate("/", { direction: "backward" })}
@@ -309,11 +275,7 @@ const IndustrialZonesPage: React.FC = () => {
                     <Icon icon="zi-arrow-left" size={30} />
                 </IconButton>
                 <Title>Khu công nghiệp</Title>
-                <Capsule aria-hidden="true">
-                    <span>...</span>
-                    <span>×</span>
-                </Capsule>
-            </Header>
+            </HeaderPage>
 
             <Content>
                 <ZoneList>

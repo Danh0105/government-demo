@@ -12,6 +12,7 @@ import { HomePage } from "./Home";
 import { InformationGuidePage } from "./InformationGuide";
 import { LegalDocumentsPage } from "./LegalDocuments";
 import { NewsPage } from "./News";
+import { NotificationsPage } from "./Notifications";
 import { PublicServicesPage } from "./PublicServices";
 import { JobsPage } from "./Jobs";
 import { IndustrialZonesPage } from "./IndustrialZones";
@@ -24,6 +25,7 @@ import { SearchPage } from "./Search";
 import { ProfilePage } from "./Profile";
 import { RadioPage } from "./Radio";
 import { TelevisionPage } from "./Television";
+import NewsDetailPage from "./News/NewsDetailPage";
 
 const Routes: React.FC = () => (
     <ZMPRouter>
@@ -31,6 +33,8 @@ const Routes: React.FC = () => (
             <Route path="/" element={<HomePage />} />
             <Route path="/index.html" element={<HomePage />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:id" element={<NewsDetailPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/legal-documents" element={<LegalDocumentsPage />} />
             <Route path="/public-services" element={<PublicServicesPage />} />
             <Route path="/jobs" element={<JobsPage />} />

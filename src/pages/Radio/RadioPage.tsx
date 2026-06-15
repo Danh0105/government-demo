@@ -109,7 +109,7 @@ const HeaderTitle = styled.h1`
     flex: 1;
     align-self: center;
     margin: 0;
-    font-size: 23px;
+    font-size: calc(23px * var(--app-font-scale));
     line-height: 1.2;
     font-weight: 950;
 `;
@@ -146,7 +146,7 @@ const HeroDecoration = styled.div`
 const HeroTitle = styled.h2`
     position: relative;
     margin: 18px 0 8px;
-    font-size: 23px;
+    font-size: calc(23px * var(--app-font-scale));
     font-weight: 950;
 `;
 
@@ -155,7 +155,7 @@ const HeroDescription = styled.p`
     max-width: 315px;
     margin: 0;
     color: rgba(255, 255, 255, 0.88);
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.6;
 `;
 
@@ -172,7 +172,7 @@ const MainButton = styled.button`
     gap: 8px;
     color: #a40818;
     background: #ffffff;
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 900;
     cursor: pointer;
 
@@ -189,14 +189,14 @@ const SectionHeader = styled.div`
 const SectionTitle = styled.h3`
     margin: 0;
     color: #20283a;
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     font-weight: 950;
 `;
 
 const SectionDescription = styled.p`
     margin: 5px 0 0;
     color: #808899;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.5;
 `;
 
@@ -240,7 +240,7 @@ const ChannelLogo = styled.div`
     border-radius: 18px;
     color: #ffffff;
     background: linear-gradient(135deg, #a40717, #e11f32);
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 950;
     letter-spacing: -0.4px;
 `;
@@ -259,7 +259,7 @@ const ChannelTopRow = styled.div`
 const ChannelName = styled.h4`
     margin: 0;
     color: #20283a;
-    font-size: 18px;
+    font-size: calc(18px * var(--app-font-scale));
     font-weight: 950;
 `;
 
@@ -268,7 +268,7 @@ const ChannelLabel = styled.span`
     border-radius: 999px;
     color: #a40717;
     background: #ffeeec;
-    font-size: 10px;
+    font-size: calc(10px * var(--app-font-scale));
     font-weight: 900;
 `;
 
@@ -276,7 +276,7 @@ const ChannelDescription = styled.p`
     margin: 6px 0 0;
     overflow: hidden;
     color: #747e90;
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.45;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -298,7 +298,7 @@ const PlayButton = styled.span`
 const Notice = styled.p`
     margin: 18px 4px 0;
     color: #8a93a2;
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.55;
     text-align: center;
 `;
@@ -306,7 +306,7 @@ const Notice = styled.p`
 const ErrorMessage = styled.p`
     margin: 14px 0 0;
     color: #b60919;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.5;
     text-align: center;
 `;

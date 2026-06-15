@@ -1,3 +1,4 @@
+import HeaderPage from "@/components/layout/HeaderPage";
 import React from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
@@ -41,27 +42,6 @@ const PageWrapper = styled(Page)`
         sans-serif;
 `;
 
-const Header = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    transform: translateX(-50%);
-    width: min(100vw, 430px);
-    height: 96px;
-    z-index: 20;
-    padding: 26px 14px 16px;
-    color: #ffffff;
-    background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.12),
-            transparent 36%
-        ),
-        linear-gradient(120deg, #820712 0%, #ad0717 52%, #d31825 100%);
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    box-shadow: 0 10px 26px rgba(109, 7, 17, 0.18);
-`;
-
 const IconButton = styled.button`
     width: 48px;
     height: 48px;
@@ -77,23 +57,9 @@ const IconButton = styled.button`
 const Title = styled.h1`
     margin: 0;
     flex: 1;
-    font-size: 28px;
+    font-size: calc(28px * var(--app-font-scale));
     line-height: 1.05;
     font-weight: 950;
-`;
-
-const Capsule = styled.div`
-    height: 44px;
-    width: 108px;
-    border-radius: 999px;
-    background: rgba(255, 245, 247, 0.86);
-    color: #151822;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    font-size: 27px;
-    font-weight: 750;
-    box-shadow: 0 10px 20px rgba(82, 3, 12, 0.2);
 `;
 
 const Content = styled.main`
@@ -120,7 +86,7 @@ const SearchInput = styled.input`
     outline: 0;
     background: transparent;
     color: #172033;
-    font-size: 18px;
+    font-size: calc(18px * var(--app-font-scale));
     font-weight: 500;
 
     &::placeholder {
@@ -145,7 +111,7 @@ const JobCard = styled.article`
 const JobTitle = styled.h2`
     margin: 0 0 18px;
     color: #182132;
-    font-size: 21px;
+    font-size: calc(21px * var(--app-font-scale));
     line-height: 1.32;
     font-weight: 950;
 `;
@@ -155,7 +121,7 @@ const LocationRow = styled.div`
     align-items: center;
     gap: 8px;
     color: #868d97;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 600;
 `;
@@ -173,7 +139,7 @@ const Salary = styled.span`
     align-items: center;
     gap: 8px;
     color: #128967;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.25;
     font-weight: 900;
 `;
@@ -183,14 +149,14 @@ const WorkType = styled.span`
     align-items: center;
     gap: 7px;
     color: #9aa0a8;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.25;
     font-weight: 650;
 `;
 
 const MoneyMark = styled.span`
     color: #13a279;
-    font-size: 19px;
+    font-size: calc(19px * var(--app-font-scale));
     font-weight: 950;
 `;
 
@@ -242,7 +208,7 @@ const JobsPage: React.FC = () => {
 
     return (
         <PageWrapper id="jobs-page">
-            <Header>
+            <HeaderPage>
                 <IconButton
                     aria-label="Quay lại"
                     onClick={() => navigate("/", { direction: "backward" })}
@@ -250,11 +216,7 @@ const JobsPage: React.FC = () => {
                     <Icon icon="zi-arrow-left" size={30} />
                 </IconButton>
                 <Title>Việc làm</Title>
-                <Capsule aria-hidden="true">
-                    <span>...</span>
-                    <span>×</span>
-                </Capsule>
-            </Header>
+            </HeaderPage>
 
             <Content>
                 <SearchBox>

@@ -1,63 +1,69 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
+
 import Thumb from "@assets/thumb.png";
 import NewsFeatured from "@assets/news-featured.jpg";
 import NewsElderly from "@assets/news-elderly.jpg";
 import NewsMeeting from "@assets/news-meeting.jpg";
 import HeaderPage from "@/components/layout/HeaderPage";
+import {
+    getArticles,
+    getArticleTypes,
+    type Article as ApiArticle,
+    type ArticleType,
+} from "@/service/news";
+import { getBaoMoiTayNinhArticles } from "@/service/webNews";
+import { openWebView } from "@service/zalo";
 
 type Category = {
+    id?: string;
     label: string;
-    active?: boolean;
 };
 
-type Article = {
-    title: string;
-    excerpt: string;
-    category: string;
-    image: string;
-};
+const fallbackImages = [NewsFeatured, NewsElderly, NewsMeeting, Thumb];
 
-const categories: Category[] = [
-    { label: "Tất cả", active: true },
-    { label: "Giới thiệu" },
-    { label: "Kinh tế - Chính trị" },
-    { label: "Văn hóa - Xã hội" },
-    { label: "Chuyển đổi số" },
-];
+function getImageUrl(article: ApiArticle, index = 0) {
+    if (article.thumb) {
+        return article.thumb;
+    }
 
-const featuredArticle: Article = {
-    title: "Thúc đẩy chi trả an sinh xã hội không dùng tiền mặt",
-    excerpt:
-        "Ngày 29/5, Công an tỉnh Thanh Hóa tổ chức hội nghị triển khai các giải pháp chi trả an sinh xã hội không dùng tiền mặt...",
-    category: "Chuyển đổi số",
-    image: NewsFeatured,
-};
+    return fallbackImages[index % fallbackImages.length];
+}
 
-const articles: Article[] = [
-    {
-        title: "Đồng chí Lê Minh Sơn, Phó Bí thư Thường trực thăm và chúc mừng",
-        excerpt:
-            "Nhân kỷ niệm Ngày truyền thống Người cao tuổi Việt Nam, lãnh đạo xã đã đến thăm, tặng hoa và gửi lời chúc mừng...",
-        category: "Văn hóa - Xã hội",
-        image: NewsElderly,
-    },
-    {
-        title: "Hội nghị triển khai cài đặt tài khoản an sinh xã hội",
-        excerpt:
-            "Chiều ngày 02/6, UBND xã Thiệu Hóa tổ chức hội nghị tuyên truyền, hướng dẫn người dân sử dụng dịch vụ số...",
-        category: "Văn hóa - Xã hội",
-        image: NewsMeeting,
-    },
-    {
-        title: "Đẩy mạnh tuyên truyền dịch vụ công trực tuyến đến từng khu dân cư",
-        excerpt:
-            "Các tổ công nghệ số cộng đồng tiếp tục hỗ trợ người dân thực hiện thủ tục hành chính trên môi trường mạng...",
-        category: "Kinh tế - Chính trị",
-        image: Thumb,
-    },
-];
+function getArticleCategory(article: ApiArticle) {
+    return article.type?.title ?? article.type?.name ?? "Tin tức";
+}
+
+function formatDate(date?: string) {
+    if (!date) return "";
+
+    return new Date(date).toLocaleDateString("vi-VN");
+}
+
+function isWebArticle(article: ApiArticle) {
+    return article.id.startsWith("web-");
+}
+
+function interleaveArticles(
+    backendArticles: ApiArticle[],
+    webArticles: ApiArticle[],
+) {
+    const mixedArticles: ApiArticle[] = [];
+    const maxLength = Math.max(backendArticles.length, webArticles.length);
+
+    for (let index = 0; index < maxLength; index += 1) {
+        if (backendArticles[index]) {
+            mixedArticles.push(backendArticles[index]);
+        }
+
+        if (webArticles[index]) {
+            mixedArticles.push(webArticles[index]);
+        }
+    }
+
+    return mixedArticles;
+}
 
 const NewsPageWrapper = styled(Page)`
     min-height: 100vh;
@@ -65,10 +71,10 @@ const NewsPageWrapper = styled(Page)`
     margin: 0 auto;
     background: radial-gradient(
             circle at 24px 126px,
-            rgba(183, 7, 22, 0.12),
+            rgba(0, 87, 160, 0.12),
             transparent 150px
         ),
-        linear-gradient(180deg, #fff7ec 0, #f6f7fa 238px, #f7f8fa 100%);
+        linear-gradient(180deg, #eef7ff 0, #f7fbff 238px, #f5f7fb 100%);
     color: #172033;
     padding: 162px 0 28px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -90,7 +96,7 @@ const BackButton = styled.button`
 const Title = styled.h1`
     margin: 0;
     flex: 1;
-    font-size: 28px;
+    font-size: calc(28px * var(--app-font-scale));
     line-height: 1.05;
     font-weight: 950;
 `;
@@ -105,12 +111,21 @@ const CategoryBar = styled.div`
     height: 66px;
     background: rgba(255, 255, 255, 0.86);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(179, 31, 43, 0.08);
+    border-bottom: 1px solid rgba(0, 95, 168, 0.1);
+
     display: flex;
+    flex-wrap: nowrap;
     gap: 10px;
-    overflow-x: auto;
+
+    overflow-x: scroll;
+    overflow-y: hidden;
+
     padding: 10px 12px 12px;
+
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
 
     &::-webkit-scrollbar {
         display: none;
@@ -121,17 +136,23 @@ const CategoryPill = styled.button<{ $active?: boolean }>`
     border: 0;
     border-radius: 16px;
     padding: 0 18px;
+
+    flex: 0 0 auto;
     min-width: max-content;
+    white-space: nowrap;
+
     color: ${({ $active }) => ($active ? "#ffffff" : "#4a5568")};
     background: ${({ $active }) =>
         $active
-            ? "linear-gradient(135deg, #a40516, #f0182c)"
+            ? "linear-gradient(135deg, #005b9f, #008bd2)"
             : "rgba(255, 255, 255, 0.92)"};
+
     box-shadow: ${({ $active }) =>
         $active
-            ? "0 12px 24px rgba(168, 5, 22, 0.24)"
+            ? "0 12px 24px rgba(0, 91, 159, 0.24)"
             : "0 8px 20px rgba(30, 35, 50, 0.08)"};
-    font-size: 18px;
+
+    font-size: calc(18px * var(--app-font-scale));
     font-weight: 850;
 `;
 
@@ -144,6 +165,7 @@ const FeaturedCard = styled.article`
     background: #ffffff;
     overflow: hidden;
     box-shadow: 0 18px 36px rgba(30, 35, 50, 0.12);
+    cursor: pointer;
 `;
 
 const FeaturedImage = styled.div<{ $image: string }>`
@@ -166,15 +188,15 @@ const Chip = styled.span`
     height: 34px;
     border-radius: 999px;
     padding: 0 14px;
-    background: #fff1f1;
-    color: #bf1020;
-    font-size: 15px;
+    background: rgba(230, 247, 255, 0.92);
+    color: #00558f;
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 850;
 `;
 
 const FeaturedTitle = styled.h2`
     margin: 14px 0 12px;
-    font-size: 26px;
+    font-size: calc(26px * var(--app-font-scale));
     line-height: 1.22;
     font-weight: 950;
     color: #172033;
@@ -183,12 +205,19 @@ const FeaturedTitle = styled.h2`
 const Excerpt = styled.p`
     margin: 0;
     color: #707987;
-    font-size: 19px;
+    font-size: calc(19px * var(--app-font-scale));
     line-height: 1.45;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+`;
+
+const Meta = styled.p`
+    margin: 10px 0 0;
+    color: #87909f;
+    font-size: calc(15px * var(--app-font-scale));
+    font-weight: 700;
 `;
 
 const ArticleList = styled.div`
@@ -206,6 +235,7 @@ const ArticleCard = styled.article`
     background: #ffffff;
     padding: 14px;
     box-shadow: 0 16px 32px rgba(30, 35, 50, 0.1);
+    cursor: pointer;
 `;
 
 const ArticleImage = styled.div<{ $image: string }>`
@@ -228,7 +258,7 @@ const ArticleBody = styled.div`
 const ArticleTitle = styled.h3`
     margin: 10px 0 10px;
     color: #172033;
-    font-size: 21px;
+    font-size: calc(21px * var(--app-font-scale));
     line-height: 1.28;
     font-weight: 950;
     display: -webkit-box;
@@ -238,7 +268,21 @@ const ArticleTitle = styled.h3`
 `;
 
 const ArticleExcerpt = styled(Excerpt)`
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
+`;
+
+const StateBox = styled.div`
+    min-height: 220px;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 16px 32px rgba(30, 35, 50, 0.1);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    color: #697386;
+    font-size: calc(18px * var(--app-font-scale));
+    font-weight: 750;
 `;
 
 const FloatingActions = styled.div`
@@ -259,12 +303,118 @@ const FloatingButton = styled.button`
     display: grid;
     place-items: center;
     color: #ffffff;
-    background: linear-gradient(135deg, #a40516, #f0182c);
-    box-shadow: 0 14px 26px rgba(168, 5, 22, 0.28);
+    background: linear-gradient(135deg, #005b9f, #008bd2);
+    box-shadow: 0 14px 26px rgba(0, 91, 159, 0.28);
 `;
 
 const NewsPage: React.FunctionComponent = () => {
     const navigate = useNavigate();
+
+    const [selectedTypeId, setSelectedTypeId] = useState<string>("");
+    const [articleTypes, setArticleTypes] = useState<ArticleType[]>([]);
+    const [articles, setArticles] = useState<ApiArticle[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const categories: Category[] = useMemo(
+        () => [
+            {
+                id: "",
+                label: "Tất cả",
+            },
+            ...articleTypes.map(type => ({
+                id: type.id,
+                label: type.title,
+            })),
+        ],
+        [articleTypes],
+    );
+
+    const featuredArticle = articles[0];
+    const normalArticles = articles.slice(1);
+
+    useEffect(() => {
+        const loadArticleTypes = async () => {
+            try {
+                const data = await getArticleTypes();
+
+                console.log("Danh sách loại tin:", data);
+
+                setArticleTypes(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Lỗi lấy danh sách loại tin:", error);
+                setArticleTypes([]);
+            }
+        };
+
+        loadArticleTypes();
+    }, []);
+
+    useEffect(() => {
+        const loadArticles = async () => {
+            setLoading(true);
+            setErrorMessage("");
+
+            try {
+                const [backendArticles, webArticles] = await Promise.all([
+                    getArticles({
+                        page: 0,
+                        typeId: selectedTypeId || undefined,
+                    }).catch(error => {
+                        console.error("Lá»—i láº¥y tin tá»« BE:", error);
+
+                        return [];
+                    }),
+                    selectedTypeId
+                        ? Promise.resolve<ApiArticle[]>([])
+                        : getBaoMoiTayNinhArticles().catch(error => {
+                              console.error("Lá»—i láº¥y tin tá»« web:", error);
+
+                              return [];
+                          }),
+                ]);
+
+                if (backendArticles.length === 0 && webArticles.length === 0) {
+                    throw new Error("Không có nguồn tin nào trả dữ liệu.");
+                }
+
+                setArticles(interleaveArticles(backendArticles, webArticles));
+            } catch (error) {
+                console.error("Lỗi lấy tin tức:", error);
+                setArticles([]);
+                setErrorMessage("Không thể tải danh sách tin tức.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadArticles();
+    }, [selectedTypeId]);
+
+    const openArticle = async (article: ApiArticle) => {
+        if (isWebArticle(article) && article.link) {
+            try {
+                await openWebView(article.link);
+            } catch (error) {
+                console.error("Lỗi mở bài viết web:", error);
+            }
+
+            return;
+        }
+
+        navigate(`/news/${article.id}`, {
+            direction: "forward",
+        });
+    };
+
+    const scrollToTop = () => {
+        const page = document.getElementById("news-page");
+
+        page?.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    };
 
     return (
         <NewsPageWrapper id="news-page">
@@ -275,14 +425,24 @@ const NewsPage: React.FunctionComponent = () => {
                 >
                     <Icon icon="zi-arrow-left" size={30} />
                 </BackButton>
+
                 <Title>Tin tức</Title>
             </HeaderPage>
 
             <CategoryBar>
                 {categories.map(category => (
                     <CategoryPill
-                        key={category.label}
-                        $active={category.active}
+                        key={category.id ?? category.label}
+                        $active={selectedTypeId === (category.id ?? "")}
+                        onClick={event => {
+                            setSelectedTypeId(category.id ?? "");
+
+                            event.currentTarget.scrollIntoView({
+                                behavior: "smooth",
+                                inline: "center",
+                                block: "nearest",
+                            });
+                        }}
                     >
                         {category.label}
                     </CategoryPill>
@@ -290,37 +450,92 @@ const NewsPage: React.FunctionComponent = () => {
             </CategoryBar>
 
             <Content>
-                <FeaturedCard>
-                    <FeaturedImage $image={featuredArticle.image} />
-                    <FeaturedBody>
-                        <Chip>{featuredArticle.category}</Chip>
-                        <FeaturedTitle>{featuredArticle.title}</FeaturedTitle>
-                        <Excerpt>{featuredArticle.excerpt}</Excerpt>
-                    </FeaturedBody>
-                </FeaturedCard>
+                {loading && <StateBox>Đang tải tin tức...</StateBox>}
 
-                <ArticleList>
-                    {articles.map(article => (
-                        <ArticleCard key={article.title}>
-                            <ArticleImage $image={article.image} />
-                            <ArticleBody>
-                                <Chip>{article.category}</Chip>
-                                <ArticleTitle>{article.title}</ArticleTitle>
-                                <ArticleExcerpt>
-                                    {article.excerpt}
-                                </ArticleExcerpt>
-                            </ArticleBody>
-                        </ArticleCard>
-                    ))}
-                </ArticleList>
+                {!loading && errorMessage && (
+                    <StateBox>{errorMessage}</StateBox>
+                )}
+
+                {!loading && !errorMessage && articles.length === 0 && (
+                    <StateBox>Chưa có tin tức nào.</StateBox>
+                )}
+
+                {!loading && !errorMessage && featuredArticle && (
+                    <>
+                        <FeaturedCard
+                            onClick={() => openArticle(featuredArticle)}
+                        >
+                            <FeaturedImage
+                                $image={getImageUrl(featuredArticle, 0)}
+                            />
+
+                            <FeaturedBody>
+                                <Chip>
+                                    {getArticleCategory(featuredArticle)}
+                                </Chip>
+
+                                <FeaturedTitle>
+                                    {featuredArticle.title}
+                                </FeaturedTitle>
+
+                                <Excerpt>{featuredArticle.desc ?? ""}</Excerpt>
+
+                                <Meta>
+                                    {featuredArticle.author ?? "Ban biên tập"}
+                                    {featuredArticle.publishedAt
+                                        ? ` · ${formatDate(
+                                              featuredArticle.publishedAt,
+                                          )}`
+                                        : ""}
+                                </Meta>
+                            </FeaturedBody>
+                        </FeaturedCard>
+
+                        <ArticleList>
+                            {normalArticles.map((article, index) => (
+                                <ArticleCard
+                                    key={article.id}
+                                    onClick={() => openArticle(article)}
+                                >
+                                    <ArticleImage
+                                        $image={getImageUrl(article, index + 1)}
+                                    />
+
+                                    <ArticleBody>
+                                        <Chip>
+                                            {getArticleCategory(article)}
+                                        </Chip>
+
+                                        <ArticleTitle>
+                                            {article.title}
+                                        </ArticleTitle>
+
+                                        <ArticleExcerpt>
+                                            {article.desc ?? ""}
+                                        </ArticleExcerpt>
+
+                                        <Meta>
+                                            {article.author ?? "Ban biên tập"}
+                                            {article.publishedAt
+                                                ? ` · ${formatDate(
+                                                      article.publishedAt,
+                                                  )}`
+                                                : ""}
+                                        </Meta>
+                                    </ArticleBody>
+                                </ArticleCard>
+                            ))}
+                        </ArticleList>
+                    </>
+                )}
             </Content>
 
             <FloatingActions>
-                <FloatingButton aria-label="Mở rộng">
+                <FloatingButton
+                    aria-label="Lên đầu trang"
+                    onClick={scrollToTop}
+                >
                     <Icon icon="zi-arrow-up" size={28} />
-                </FloatingButton>
-                <FloatingButton aria-label="Trò chuyện">
-                    <Icon icon="zi-chat" size={31} />
                 </FloatingButton>
             </FloatingActions>
         </NewsPageWrapper>

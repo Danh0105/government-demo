@@ -37,10 +37,10 @@ const PageWrapper = styled(Page)`
     margin: 0 auto;
     background: radial-gradient(
             circle at 36px 132px,
-            rgba(183, 7, 22, 0.1),
+            rgba(0, 87, 160, 0.12),
             transparent 150px
         ),
-        linear-gradient(180deg, #fff7ec 0, #f7f7f9 224px, #f7f8fa 100%);
+        linear-gradient(180deg, #eef7ff 0, #f7fbff 224px, #f5f7fb 100%);
     color: #172033;
     padding: 112px 0 32px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -62,7 +62,7 @@ const BackButton = styled.button`
 const Title = styled.h1`
     margin: 0;
     flex: 1;
-    font-size: 26px;
+    font-size: calc(26px * var(--app-font-scale));
     line-height: 1.08;
     font-weight: 950;
     white-space: nowrap;
@@ -92,7 +92,7 @@ const SearchInput = styled.input`
     outline: none;
     background: transparent;
     color: #172033;
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     font-weight: 500;
 
     &::placeholder {
@@ -124,13 +124,13 @@ const DocumentIcon = styled.div`
     border-radius: 16px;
     display: grid;
     place-items: center;
-    color: #d38113;
+    color: #0063a7;
     background: radial-gradient(
             circle at 35% 25%,
             rgba(255, 255, 255, 0.9),
             transparent 22%
         ),
-        linear-gradient(135deg, #fffaf0, #fff1cc);
+        linear-gradient(135deg, #f7fcff, #e4f3ff);
 `;
 
 const DocumentBody = styled.div`
@@ -140,7 +140,7 @@ const DocumentBody = styled.div`
 const DocumentTitle = styled.h2`
     margin: 0;
     color: #172033;
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 930;
     display: -webkit-box;
@@ -152,7 +152,7 @@ const DocumentTitle = styled.h2`
 const DocumentMeta = styled.p`
     margin: 8px 0 0;
     color: #737c89;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 1.35;
     white-space: nowrap;
     overflow: hidden;
@@ -183,8 +183,8 @@ const FloatingButton = styled.button`
     display: grid;
     place-items: center;
     color: #ffffff;
-    background: linear-gradient(135deg, #a40516, #f0182c);
-    box-shadow: 0 14px 26px rgba(168, 5, 22, 0.28);
+    background: linear-gradient(135deg, #005b9f, #008bd2);
+    box-shadow: 0 14px 26px rgba(0, 91, 159, 0.28);
 `;
 
 const LegalDocumentsPage: React.FunctionComponent = () => {

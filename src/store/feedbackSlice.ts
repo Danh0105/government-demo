@@ -6,7 +6,7 @@ import {
     GetFeedbacksParams,
     GetFeedbackTypeParams,
     getFeedbackTypes,
-} from "@service/services.mock";
+} from "@service/services";
 import { StateCreator } from "zustand";
 
 export interface FeedbackSlice {

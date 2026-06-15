@@ -15,13 +15,13 @@ const Wrapper = styled(List.Item)`
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        font-size: 12px;
+        font-size: calc(12px * var(--app-font-scale));
     }
     .zaui-list-item-title-container {
         height: 20px;
     }
     .zaui-list-item-title {
-        font-size: 15px;
+        font-size: calc(15px * var(--app-font-scale));
         line-height: 20px;
         font-weight: 500;
         width: 100%;

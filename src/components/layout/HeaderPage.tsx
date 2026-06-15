@@ -18,13 +18,13 @@ const HeaderPage = styled.header`
     color: #ffffff;
 
     background: radial-gradient(
-            circle at 88% -30%,
-            rgba(255, 224, 162, 0.38),
-            transparent 42%
+            circle at 18% 18%,
+            rgba(77, 184, 255, 0.28),
+            transparent 34%
         ),
-        linear-gradient(125deg, #720812 0%, #a80818 52%, #cf1727 100%);
+        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
 
-    box-shadow: 0 10px 26px rgba(104, 5, 16, 0.22);
+    box-shadow: 0 10px 26px rgba(0, 50, 95, 0.24);
 `;
 
 export const BackButton = styled.button`
@@ -44,7 +44,7 @@ export const BackButton = styled.button`
     color: #ffffff;
     background: rgba(255, 255, 255, 0.14);
 
-    box-shadow: 0 8px 18px rgba(73, 3, 11, 0.16),
+    box-shadow: 0 8px 18px rgba(0, 50, 95, 0.18),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
     backdrop-filter: blur(8px);
@@ -67,7 +67,7 @@ export const Title = styled.h1`
     flex: 1;
 
     color: #ffffff;
-    font-size: 23px;
+    font-size: calc(23px * var(--app-font-scale));
     line-height: 1.15;
     font-weight: 900;
     letter-spacing: -0.35px;

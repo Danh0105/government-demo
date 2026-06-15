@@ -53,10 +53,10 @@ const PageWrapper = styled(Page)`
     margin: 0 auto;
     background: radial-gradient(
             circle at 30px 132px,
-            rgba(183, 7, 22, 0.12),
+            rgba(0, 87, 160, 0.12),
             transparent 150px
         ),
-        linear-gradient(180deg, #fff7ec 0, #f7f7f9 250px, #f7f8fa 100%);
+        linear-gradient(180deg, #eef7ff 0, #f7fbff 250px, #f5f7fb 100%);
     color: #172033;
     padding: 112px 0 32px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -78,7 +78,7 @@ const BackButton = styled.button`
 const Title = styled.h1`
     margin: 0;
     flex: 1;
-    font-size: 24px;
+    font-size: calc(24px * var(--app-font-scale));
     line-height: 1.08;
     font-weight: 950;
 `;
@@ -96,8 +96,8 @@ const HeroCard = styled.section`
             rgba(255, 255, 255, 0.16),
             transparent 34%
         ),
-        linear-gradient(135deg, #670711 0%, #a70718 54%, #e1a24c 100%);
-    box-shadow: 0 20px 38px rgba(123, 7, 18, 0.2);
+        linear-gradient(135deg, #00325f 0%, #004b86 52%, #008bd2 100%);
+    box-shadow: 0 20px 38px rgba(0, 75, 134, 0.2);
 `;
 
 const HeroEyebrow = styled.div`
@@ -105,14 +105,14 @@ const HeroEyebrow = styled.div`
     border-radius: 999px;
     padding: 7px 12px;
     background: rgba(255, 255, 255, 0.16);
-    color: #ffe9b1;
-    font-size: 13px;
+    color: #d9f2ff;
+    font-size: calc(13px * var(--app-font-scale));
     font-weight: 850;
 `;
 
 const HeroTitle = styled.h2`
     margin: 16px 0 10px;
-    font-size: 27px;
+    font-size: calc(27px * var(--app-font-scale));
     line-height: 1.14;
     font-weight: 980;
 `;
@@ -120,7 +120,7 @@ const HeroTitle = styled.h2`
 const HeroText = styled.p`
     margin: 0;
     color: rgba(255, 255, 255, 0.82);
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 1.45;
 `;
 
@@ -134,9 +134,9 @@ const PrimaryButton = styled.button`
     align-items: center;
     justify-content: center;
     gap: 10px;
-    color: #8d0714;
-    background: #ffe9b1;
-    font-size: 17px;
+    color: #005b9f;
+    background: #e6f7ff;
+    font-size: calc(17px * var(--app-font-scale));
     font-weight: 900;
     box-shadow: 0 12px 22px rgba(41, 4, 9, 0.2);
 `;
@@ -161,7 +161,7 @@ const SearchInput = styled.input`
     outline: none;
     background: transparent;
     color: #172033;
-    font-size: 18px;
+    font-size: calc(18px * var(--app-font-scale));
     font-weight: 500;
 
     &::placeholder {
@@ -172,7 +172,7 @@ const SearchInput = styled.input`
 const SectionTitle = styled.h2`
     margin: 24px 4px 14px;
     color: #172033;
-    font-size: 23px;
+    font-size: calc(23px * var(--app-font-scale));
     line-height: 1.15;
     font-weight: 950;
 `;
@@ -202,19 +202,19 @@ const ActionIcon = styled.div`
     border-radius: 16px;
     display: grid;
     place-items: center;
-    color: #d38113;
+    color: #0063a7;
     background: radial-gradient(
             circle at 35% 25%,
             rgba(255, 255, 255, 0.9),
             transparent 22%
         ),
-        linear-gradient(135deg, #fffaf0, #fff1cc);
+        linear-gradient(135deg, #f7fcff, #e4f3ff);
 `;
 
 const ActionTitle = styled.h3`
     margin: 0;
     color: #172033;
-    font-size: 19px;
+    font-size: calc(19px * var(--app-font-scale));
     line-height: 1.28;
     font-weight: 930;
 `;
@@ -222,7 +222,7 @@ const ActionTitle = styled.h3`
 const ActionDescription = styled.p`
     margin: 7px 0 0;
     color: #737c89;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.35;
 `;
 
@@ -246,7 +246,7 @@ const ServiceCard = styled.button`
     color: #172033;
     background: #ffffff;
     text-align: left;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 860;
     box-shadow: 0 14px 28px rgba(30, 35, 50, 0.09);
@@ -256,10 +256,10 @@ const NoteCard = styled.section`
     margin-top: 18px;
     border-radius: 22px;
     padding: 18px;
-    background: #fff9ed;
-    color: #7b4a15;
-    border: 1px solid rgba(225, 162, 76, 0.26);
-    font-size: 15px;
+    background: #f0f9ff;
+    color: #00558f;
+    border: 1px solid rgba(0, 95, 168, 0.14);
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.45;
 `;
 

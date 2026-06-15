@@ -4,6 +4,7 @@ import { Icon, Page, useNavigate } from "zmp-ui";
 import Thumb from "@assets/thumb.png";
 import Background from "@assets/background.png";
 import SocialInsurance from "@assets/social-insurance.png";
+import HeaderPage from "@/components/layout/HeaderPage";
 
 type CategoryId = "all" | "coop" | "regional";
 
@@ -69,38 +70,19 @@ const PageWrapper = styled(Page)`
     min-height: 100vh;
     max-width: 430px;
     margin: 0 auto;
-    background: #f7f5f2;
-    color: #172033;
+    background: #f3f7fb;
+    color: #082b55;
     padding: 112px 0 96px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
 `;
 
-const Header = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    transform: translateX(-50%);
-    width: min(100vw, 430px);
-    z-index: 20;
-    height: 96px;
-    padding: 24px 14px 14px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.2),
-        rgba(255, 255, 255, 0.9)
-    );
-    backdrop-filter: blur(12px);
-`;
-
 const HeaderTitle = styled.h1`
     margin: 0;
-    font-size: 24px;
+    font-size: calc(23px * var(--app-font-scale));
     line-height: 1.1;
     font-weight: 900;
-    color: #1b1f26;
+    color: #ffffff;
 `;
 
 const Content = styled.main`
@@ -110,24 +92,36 @@ const Content = styled.main`
 const TabRow = styled.div`
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 9px;
     margin: 16px 0 20px;
 `;
 
 const TabButton = styled.button<{ $active?: boolean }>`
-    min-height: 46px;
-    border: 0;
-    border-radius: 16px;
-    padding: 12px 12px;
-    font-size: 13px;
-    font-weight: 700;
+    min-height: 48px;
+    border: 1px solid ${({ $active }) => ($active ? "#0878bd" : "#d4e6f4")};
+    border-radius: 15px;
+    padding: 10px 8px;
+    font-size: calc(12px * var(--app-font-scale));
+    line-height: 1.25;
+    font-weight: 800;
     text-align: center;
-    color: ${({ $active }) => ($active ? "#ffffff" : "#4b5563")};
-    background: ${({ $active }) => ($active ? "#d8162a" : "#ffffff")};
+
+    color: ${({ $active }) => ($active ? "#ffffff" : "#164b78")};
+    background: ${({ $active }) =>
+        $active
+            ? "linear-gradient(135deg, #075d9c 0%, #0788cf 100%)"
+            : "#ffffff"};
+
     box-shadow: ${({ $active }) =>
         $active
-            ? "0 10px 20px rgba(216, 22, 42, 0.18)"
-            : "0 8px 18px rgba(18, 28, 45, 0.06)"};
+            ? "0 9px 18px rgba(7, 120, 189, 0.24)"
+            : "0 6px 16px rgba(17, 76, 120, 0.06)"};
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+    &:active {
+        transform: scale(0.97);
+    }
 `;
 
 const ProductList = styled.div`
@@ -138,24 +132,31 @@ const ProductList = styled.div`
 
 const ProductCard = styled.button`
     width: 100%;
-    border: 0;
-    border-radius: 22px;
+    border: 1px solid #e3edf5;
+    border-radius: 20px;
     background: #ffffff;
-    box-shadow: 0 12px 28px rgba(18, 28, 45, 0.08);
+    box-shadow: 0 10px 24px rgba(11, 73, 121, 0.07);
     display: flex;
-    gap: 14px;
-    padding: 14px;
+    gap: 13px;
+    padding: 13px;
     text-align: left;
     align-items: center;
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:active {
+        transform: scale(0.985);
+        box-shadow: 0 6px 16px rgba(11, 73, 121, 0.1);
+    }
 `;
 
 const ProductImage = styled.div<{ $image: string }>`
-    width: 82px;
-    height: 82px;
-    border-radius: 18px;
+    width: 84px;
+    height: 84px;
+    border-radius: 17px;
     background: url(${({ $image }) => $image}) center/cover;
     flex-shrink: 0;
+    border: 1px solid #e0ebf4;
 `;
 
 const ProductInfo = styled.div`
@@ -166,17 +167,17 @@ const ProductInfo = styled.div`
 
 const ProductName = styled.h2`
     margin: 0;
-    font-size: 17px;
-    line-height: 1.25;
+    font-size: calc(16px * var(--app-font-scale));
+    line-height: 1.3;
     font-weight: 900;
-    color: #121828;
+    color: #082b55;
 `;
 
 const ProductSubtitle = styled.p`
     margin: 0;
-    color: #6b7280;
-    font-size: 14px;
-    line-height: 1.5;
+    color: #66829c;
+    font-size: calc(13px * var(--app-font-scale));
+    line-height: 1.45;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -188,29 +189,49 @@ const ProductFooter = styled.div`
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+    color: #0878bd;
 `;
 
 const Badge = styled.span`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
+    padding: 7px 11px;
     border-radius: 999px;
-    background: rgba(216, 22, 42, 0.12);
-    color: #d8162a;
-    font-size: 13px;
-    font-weight: 800;
+    background: #fff5d9;
+    color: #b46800;
+    border: 1px solid #ffe5a5;
+    font-size: calc(12px * var(--app-font-scale));
+    font-weight: 900;
 `;
 
 const EmptyState = styled.div`
     margin-top: 40px;
     padding: 32px 18px;
-    border-radius: 24px;
+    border-radius: 20px;
     text-align: center;
     background: #ffffff;
-    box-shadow: 0 12px 28px rgba(18, 28, 45, 0.08);
-    color: #4b5563;
-    font-size: 16px;
+    border: 1px solid #e3edf5;
+    box-shadow: 0 10px 24px rgba(11, 73, 121, 0.07);
+    color: #66829c;
+    font-size: calc(15px * var(--app-font-scale));
+`;
+
+const IconButton = styled.button`
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(0, 42, 82, 0.18);
+    backdrop-filter: blur(8px);
+
+    &:active {
+        transform: scale(0.96);
+    }
 `;
 
 const OCOPPage: React.FC = () => {
@@ -229,13 +250,13 @@ const OCOPPage: React.FC = () => {
 
     return (
         <PageWrapper>
-            <Header>
+            <HeaderPage>
                 <IconButton onClick={() => navigate(-1)}>
                     <Icon icon="zi-arrow-left" size={20} />
                 </IconButton>
                 <HeaderTitle>Sản phẩm</HeaderTitle>
                 <div style={{ width: 48 }} />
-            </Header>
+            </HeaderPage>
 
             <Content>
                 <TabRow>
@@ -278,17 +299,5 @@ const OCOPPage: React.FC = () => {
         </PageWrapper>
     );
 };
-
-const IconButton = styled.button`
-    width: 48px;
-    height: 48px;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: rgba(255, 255, 255, 0.82);
-    color: #d8162a;
-    box-shadow: 0 8px 24px rgba(18, 28, 45, 0.12);
-`;
 
 export default OCOPPage;

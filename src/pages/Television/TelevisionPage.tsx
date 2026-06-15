@@ -53,7 +53,12 @@ const PageWrapper = styled(Page)`
     margin: 0 auto;
     padding: 112px 0 40px;
     color: #172033;
-    background: linear-gradient(180deg, #f7f7f7 0%, #ffffff 100%);
+    background: radial-gradient(
+            circle at 24px 140px,
+            rgba(0, 87, 160, 0.12),
+            transparent 150px
+        ),
+        linear-gradient(180deg, #eef7ff 0, #f7fbff 260px, #f5f7fb 100%);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
 `;
@@ -69,8 +74,13 @@ const Header = styled.header`
     align-items: flex-end;
     gap: 12px;
     color: #ffffff;
-    background: linear-gradient(120deg, #920713 0%, #c70718 56%, #e2282e 100%);
-    box-shadow: 0 12px 30px rgba(146, 7, 21, 0.2);
+    background: radial-gradient(
+            circle at 18% 18%,
+            rgba(77, 184, 255, 0.28),
+            transparent 34%
+        ),
+        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
+    box-shadow: 0 12px 30px rgba(0, 50, 95, 0.24);
     transform: translateX(-50%);
 `;
 
@@ -91,7 +101,7 @@ const HeaderTitle = styled.h1`
     flex: 1;
     align-self: center;
     margin: 0;
-    font-size: 23px;
+    font-size: calc(23px * var(--app-font-scale));
     line-height: 1.2;
     font-weight: 950;
 `;
@@ -111,8 +121,8 @@ const Hero = styled.section`
     overflow: hidden;
     border-radius: 24px;
     color: #ffffff;
-    background: linear-gradient(135deg, #81040f 0%, #cb1023 100%);
-    box-shadow: 0 16px 34px rgba(182, 15, 31, 0.2);
+    background: linear-gradient(135deg, #00325f 0%, #004b86 52%, #008bd2 100%);
+    box-shadow: 0 16px 34px rgba(0, 75, 134, 0.2);
 `;
 
 const HeroDecoration = styled.div`
@@ -138,7 +148,7 @@ const TelevisionIcon = styled.div`
 const HeroTitle = styled.h2`
     position: relative;
     margin: 18px 0 8px;
-    font-size: 23px;
+    font-size: calc(23px * var(--app-font-scale));
     line-height: 1.3;
     font-weight: 950;
 `;
@@ -148,7 +158,7 @@ const HeroDescription = styled.p`
     max-width: 320px;
     margin: 0;
     color: rgba(255, 255, 255, 0.88);
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.6;
 `;
 
@@ -163,9 +173,9 @@ const MainButton = styled.button`
     align-items: center;
     justify-content: center;
     gap: 8px;
-    color: #a40818;
+    color: #005b9f;
     background: #ffffff;
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 900;
     cursor: pointer;
 
@@ -182,14 +192,14 @@ const SectionHeader = styled.div`
 const SectionTitle = styled.h3`
     margin: 0;
     color: #20283a;
-    font-size: 20px;
+    font-size: calc(20px * var(--app-font-scale));
     font-weight: 950;
 `;
 
 const SectionDescription = styled.p`
     margin: 5px 0 0;
     color: #808899;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.5;
 `;
 
@@ -232,8 +242,8 @@ const ChannelLogo = styled.div`
     place-items: center;
     border-radius: 18px;
     color: #ffffff;
-    background: linear-gradient(135deg, #a40717, #e11f32);
-    font-size: 16px;
+    background: linear-gradient(135deg, #005b9f, #008bd2);
+    font-size: calc(16px * var(--app-font-scale));
     font-weight: 950;
     letter-spacing: -0.4px;
 `;
@@ -252,16 +262,16 @@ const ChannelTopRow = styled.div`
 const ChannelName = styled.h4`
     margin: 0;
     color: #20283a;
-    font-size: 18px;
+    font-size: calc(18px * var(--app-font-scale));
     font-weight: 950;
 `;
 
 const ChannelLabel = styled.span`
     padding: 4px 7px;
     border-radius: 999px;
-    color: #a40717;
-    background: #ffeeec;
-    font-size: 10px;
+    color: #00558f;
+    background: #e6f7ff;
+    font-size: calc(10px * var(--app-font-scale));
     font-weight: 900;
 `;
 
@@ -269,7 +279,7 @@ const ChannelDescription = styled.p`
     margin: 6px 0 0;
     overflow: hidden;
     color: #747e90;
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.45;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -284,14 +294,14 @@ const PlayButton = styled.span`
     display: grid;
     place-items: center;
     border-radius: 50%;
-    color: #b60919;
-    background: #ffeeec;
+    color: #005b9f;
+    background: #e6f7ff;
 `;
 
 const ErrorMessage = styled.p`
     margin: 15px 4px 0;
-    color: #b60919;
-    font-size: 14px;
+    color: #005b9f;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.5;
     text-align: center;
 `;
@@ -299,7 +309,7 @@ const ErrorMessage = styled.p`
 const Notice = styled.p`
     margin: 18px 4px 0;
     color: #8a93a2;
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.55;
     text-align: center;
 `;

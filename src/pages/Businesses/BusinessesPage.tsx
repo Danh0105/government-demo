@@ -4,6 +4,7 @@ import { Icon, Page, useNavigate } from "zmp-ui";
 import Thumb from "@assets/thumb.png";
 import Background from "@assets/background.png";
 import SocialInsurance from "@assets/social-insurance.png";
+import HeaderPage from "@/components/layout/HeaderPage";
 
 type Business = {
     name: string;
@@ -63,31 +64,12 @@ const PageWrapper = styled(Page)`
         sans-serif;
 `;
 
-const Header = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    transform: translateX(-50%);
-    width: min(100vw, 430px);
-    z-index: 20;
-    height: 96px;
-    padding: 24px 14px 14px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.22),
-        rgba(255, 255, 255, 0.96)
-    );
-    backdrop-filter: blur(14px);
-`;
-
 const Title = styled.h1`
     margin: 0;
-    font-size: 24px;
+    font-size: calc(24px * var(--app-font-scale));
     line-height: 1.1;
     font-weight: 900;
-    color: #1c1f26;
+    color: #ffffff;
 `;
 
 const Content = styled.main`
@@ -132,7 +114,7 @@ const BusinessTop = styled.div`
 
 const BusinessName = styled.h2`
     margin: 0;
-    font-size: 18px;
+    font-size: calc(18px * var(--app-font-scale));
     line-height: 1.35;
     font-weight: 900;
     color: #121828;
@@ -152,7 +134,7 @@ const Badge = styled.span<{ $tone: "red" | "green" }>`
     justify-content: center;
     padding: 6px 12px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: calc(12px * var(--app-font-scale));
     font-weight: 800;
     color: ${({ $tone }) => ($tone === "red" ? "#bb1b24" : "#146c32")};
     background: ${({ $tone }) =>
@@ -166,14 +148,14 @@ const AddressRow = styled.div`
     align-items: center;
     gap: 8px;
     color: #6b7280;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.5;
 `;
 
 const Description = styled.p`
     margin: 0;
     color: #6b7280;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.6;
 `;
 
@@ -189,7 +171,7 @@ const Phone = styled.span`
     align-items: center;
     gap: 8px;
     color: #d8162a;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     font-weight: 700;
 `;
 
@@ -198,7 +180,7 @@ const Website = styled.span`
     align-items: center;
     gap: 8px;
     color: #475467;
-    font-size: 14px;
+    font-size: calc(14px * var(--app-font-scale));
     font-weight: 700;
 `;
 
@@ -219,18 +201,15 @@ const BusinessesPage: React.FC = () => {
 
     return (
         <PageWrapper id="businesses-page">
-            <Header>
+            <HeaderPage>
                 <IconButton
                     aria-label="Quay lại"
-                    onClick={() => navigate(-1, { direction: "backward" })}
+                    onClick={() => navigate("/", { direction: "backward" })}
                 >
-                    <Icon icon="zi-arrow-left" size={24} />
+                    <Icon icon="zi-arrow-left" size={30} />
                 </IconButton>
                 <Title>Doanh nghiệp</Title>
-                <IconButton aria-label="Đóng">
-                    <Icon icon="zi-close" size={24} />
-                </IconButton>
-            </Header>
+            </HeaderPage>
 
             <Content>
                 <BusinessList>

@@ -14,7 +14,7 @@ const Wrapper = styled.div`
 `;
 const SectionTrigger = styled.div`
     ${tw` relative flex items-center w-full cursor-pointer justify-between border-t border-t-devider_1 `}
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 22px;
     font-weight: 500;
     padding: 16px;

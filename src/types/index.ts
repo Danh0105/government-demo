@@ -79,10 +79,31 @@ export type Feedback = {
     title: string;
     content: string;
     response: string;
+    receivingUnitId?: number;
+    receivingUnitName?: string;
+    senderFullName?: string;
+    senderPhone?: string;
+    senderEmail?: string;
+    provideSenderAddress?: boolean;
+    senderAddress?: string;
+    province?: string;
+    district?: string;
+    ward?: string;
+    addressDetail?: string;
+    latitude?: number;
+    longitude?: number;
+    occurredAt?: Date;
     creationTime: Date;
     responseTime: Date;
     type: string;
+    status?: string;
+    isAnonymous?: boolean;
+    isPublic?: boolean;
+    isResultPublic?: boolean;
+    feedbackTypeId?: string;
+    feedbackType?: FeedbackType;
     imageUrls?: string[];
+    attachmentUrls?: string[];
 };
 
 export type InformationGuide = {
@@ -92,9 +113,11 @@ export type InformationGuide = {
 };
 
 export type FeedbackType = {
-    id: number;
+    id: string;
     title: string;
     order: number;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type Feedbacks = {

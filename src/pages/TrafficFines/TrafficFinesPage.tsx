@@ -11,7 +11,12 @@ const PageWrapper = styled(Page)`
     margin: 0 auto;
     padding: 112px 0 32px;
     color: #172033;
-    background: linear-gradient(180deg, #f7f7f7 0%, #ffffff 100%);
+    background: radial-gradient(
+            circle at 24px 140px,
+            rgba(0, 87, 160, 0.12),
+            transparent 150px
+        ),
+        linear-gradient(180deg, #eef7ff 0, #f7fbff 260px, #f5f7fb 100%);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
 `;
@@ -28,8 +33,13 @@ const Header = styled.header`
     gap: 12px;
     transform: translateX(-50%);
     color: #ffffff;
-    background: linear-gradient(120deg, #920713 0%, #c70718 56%, #e2282e 100%);
-    box-shadow: 0 12px 30px rgba(146, 7, 21, 0.2);
+    background: radial-gradient(
+            circle at 18% 18%,
+            rgba(77, 184, 255, 0.28),
+            transparent 34%
+        ),
+        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
+    box-shadow: 0 12px 30px rgba(0, 50, 95, 0.24);
 `;
 
 const BackButton = styled.button`
@@ -49,7 +59,7 @@ const HeaderTitle = styled.h1`
     flex: 1;
     margin: 0;
     align-self: center;
-    font-size: 22px;
+    font-size: calc(22px * var(--app-font-scale));
     line-height: 1.2;
     font-weight: 900;
 `;
@@ -69,8 +79,8 @@ const HeroCard = styled.section`
     position: relative;
     border-radius: 24px;
     color: #ffffff;
-    background: linear-gradient(135deg, #a40717 0%, #e01c2d 100%);
-    box-shadow: 0 16px 34px rgba(182, 15, 31, 0.2);
+    background: linear-gradient(135deg, #00325f 0%, #004b86 52%, #008bd2 100%);
+    box-shadow: 0 16px 34px rgba(0, 75, 134, 0.2);
 `;
 
 const HeroIcon = styled.div`
@@ -84,7 +94,7 @@ const HeroIcon = styled.div`
 
 const HeroTitle = styled.h2`
     margin: 18px 0 8px;
-    font-size: 22px;
+    font-size: calc(22px * var(--app-font-scale));
     line-height: 1.3;
     font-weight: 950;
 `;
@@ -93,7 +103,7 @@ const HeroDescription = styled.p`
     margin: 0;
     max-width: 330px;
     color: rgba(255, 255, 255, 0.88);
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.6;
 `;
 
@@ -109,7 +119,7 @@ const InfoCard = styled.section`
 const InfoTitle = styled.h3`
     margin: 0 0 14px;
     color: #20283a;
-    font-size: 17px;
+    font-size: calc(17px * var(--app-font-scale));
     font-weight: 900;
 `;
 
@@ -123,7 +133,7 @@ const StepItem = styled.div`
     align-items: flex-start;
     gap: 12px;
     color: #596378;
-    font-size: 15px;
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.5;
 `;
 
@@ -134,9 +144,9 @@ const StepNumber = styled.span`
     display: grid;
     place-items: center;
     border-radius: 50%;
-    color: #b60f1f;
-    background: #ffeeec;
-    font-size: 13px;
+    color: #00558f;
+    background: #e6f7ff;
+    font-size: calc(13px * var(--app-font-scale));
     font-weight: 900;
 `;
 
@@ -151,9 +161,9 @@ const OpenButton = styled.button`
     justify-content: center;
     gap: 8px;
     color: #ffffff;
-    background: linear-gradient(135deg, #b60919, #ea0f2b);
-    box-shadow: 0 12px 24px rgba(182, 15, 31, 0.2);
-    font-size: 16px;
+    background: linear-gradient(135deg, #005b9f, #008bd2);
+    box-shadow: 0 12px 24px rgba(0, 91, 159, 0.2);
+    font-size: calc(16px * var(--app-font-scale));
     font-weight: 900;
     cursor: pointer;
 
@@ -166,15 +176,15 @@ const OpenButton = styled.button`
 const Notice = styled.p`
     margin: 16px 2px 0;
     color: #788293;
-    font-size: 13px;
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.6;
     text-align: center;
 `;
 
 const ErrorMessage = styled.p`
     margin: 14px 0 0;
-    color: #b60919;
-    font-size: 14px;
+    color: #005b9f;
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.5;
     text-align: center;
 `;

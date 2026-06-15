@@ -34,7 +34,7 @@ const FieldName = styled(Text)`
         return "";
     }}
     font-weight: 500;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 22px;
 `;
 const ValueText = styled(Text)`
@@ -46,13 +46,13 @@ const ValueText = styled(Text)`
         return "";
     }}
     font-weight: 500;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 22px;
 `;
 
 const NotiText = styled(Text)`
     ${tw`text-text_2 mt-2`}
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 22px;
 `;
 export type ProfileInfoProps = {

@@ -19,7 +19,7 @@ export const FieldName = styled(Text)`
         return "";
     }}
     font-weight: 500;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 22px;
 `;
 export const ValueText = styled(Text)`
@@ -31,6 +31,6 @@ export const ValueText = styled(Text)`
         return "";
     }}
     font-weight: 500;
-    font-size: 16px;
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 22px;
 `;
