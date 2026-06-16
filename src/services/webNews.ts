@@ -1,4 +1,4 @@
-import type { Article } from "@/service/news";
+import type { Article } from "@/services/news";
 
 const BAOMOI_TAY_NINH_URL = "https://baomoi.com/tay-ninh-tag3238.epi";
 const BAOMOI_ORIGIN = "https://baomoi.com";

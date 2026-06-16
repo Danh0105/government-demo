@@ -22,10 +22,27 @@ import { TrafficFinesPage } from "./TrafficFines";
 import { CreateScheduleAppointmentPage } from "./CreateScheduleAppointment";
 import { AppointmentScheduleResultPage } from "./AppointmentScheduleResult";
 import { SearchPage } from "./Search";
-import { ProfilePage } from "./Profile";
+import {
+    AccountInfoPage,
+    GovernmentContactPage,
+    LoyaltyPointsPage,
+    ProfilePage,
+    SyncHistoryPage,
+} from "./Profile";
 import { RadioPage } from "./Radio";
 import { TelevisionPage } from "./Television";
 import NewsDetailPage from "./News/NewsDetailPage";
+import DestinationsPage from "./Destinations/page";
+import EventsPage from "./Events/page";
+import LegalDocumentDetailPage from "./LegalDocuments/LegalDocumentDetailPage";
+import OCOPDetailPage from "./OCOP/OCOPDetailPage";
+import JobDetailPage from "./Jobs/JobDetailPage";
+import IndustrialZoneDetailPage from "./IndustrialZones/IndustrialZoneDetailPage";
+import { HotelPage } from "./Hotels";
+import { RestaurantPage } from "./Restaurant";
+import BusinessDetailPage from "./Businesses/BusinessDetailPage";
+import { TransportPage } from "./Transports";
+import PrivacyPolicyPage from "./Profile/PrivacyPolicyPage";
 
 const Routes: React.FC = () => (
     <ZMPRouter>
@@ -36,14 +53,25 @@ const Routes: React.FC = () => (
             <Route path="/news/:id" element={<NewsDetailPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/legal-documents" element={<LegalDocumentsPage />} />
+            <Route
+                path="/legal-documents/:id"
+                element={<LegalDocumentDetailPage />}
+            />
             <Route path="/public-services" element={<PublicServicesPage />} />
             <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/industrial-zones" element={<IndustrialZonesPage />} />
+            <Route
+                path="/industrial-zones/:id"
+                element={<IndustrialZoneDetailPage />}
+            />
             <Route path="/businesses" element={<BusinessesPage />} />
+            <Route path="/businesses/:id" element={<BusinessDetailPage />} />
             <Route path="/traffic-fines" element={<TrafficFinesPage />} />
             <Route path="/radio" element={<RadioPage />} />
             <Route path="/television" element={<TelevisionPage />} />
             <Route path="/ocop" element={<OCOPPage />} />
+            <Route path="/ocops/:id" element={<OCOPDetailPage />} />
             <Route path="/guidelines" element={<GuidelinesPage />} />
 
             <Route path="/feedbacks" element={<FeedbackPage />} />
@@ -63,6 +91,19 @@ const Routes: React.FC = () => (
             />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/account-info" element={<AccountInfoPage />} />
+            <Route
+                path="/government-contact"
+                element={<GovernmentContactPage />}
+            />
+            <Route path="/loyalty-points" element={<LoyaltyPointsPage />} />
+            <Route path="/sync-history" element={<SyncHistoryPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/hotels" element={<HotelPage />} />
+            <Route path="/transport" element={<TransportPage />} />
+            <Route path="/restaurants" element={<RestaurantPage />} />
+            <Route path="/events" element={<EventsPage />} />
         </AnimationRoutes>
     </ZMPRouter>
 );

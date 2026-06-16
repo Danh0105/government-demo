@@ -1,5 +1,5 @@
 import { User } from "@dts";
-import { getToken, getZaloUserInfo } from "@service/zalo";
+import { getToken, getZaloUserInfo } from "@/services/zalo";
 import { StateCreator } from "zustand";
 
 export interface AuthSlice {
@@ -12,6 +12,7 @@ export interface AuthSlice {
     getUser: () => User | undefined;
     setUser: (user: User) => void;
     setLoading: (loading: boolean) => void;
+    logout: () => void;
     getUserInfo: () => Promise<void>;
     getAccessToken: () => Promise<void>;
 }
@@ -31,6 +32,9 @@ const authSlice: StateCreator<AuthSlice, [], [], AuthSlice> = (set, get) => ({
     },
     setLoading: (loading: boolean) => {
         set(state => ({ ...state, loading }));
+    },
+    logout: () => {
+        set(state => ({ ...state, user: undefined }));
     },
     getUserInfo: async () => {
         try {

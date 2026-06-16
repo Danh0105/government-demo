@@ -5,13 +5,14 @@ import { Icon, Page, useNavigate } from "zmp-ui";
 
 import Thumb from "@assets/thumb.png";
 import NewsFeatured from "@assets/news-featured.jpg";
-import HeaderPage from "@/components/layout/HeaderPage";
+import AppHeader from "@components/layout/AppHeader";
 import {
     getArticle,
     recordArticleView,
     updateArticleLike,
     type Article,
-} from "@/service/news";
+} from "@/services/news";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 function formatDate(date?: string) {
     if (!date) return "";
@@ -58,26 +59,6 @@ const DetailPageWrapper = styled(Page)`
     padding: 96px 0 34px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const BackButton = styled.button`
-    width: 48px;
-    height: 48px;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-`;
-
-const Title = styled.h1`
-    margin: 0;
-    flex: 1;
-    font-size: calc(25px * var(--app-font-scale));
-    line-height: 1.1;
-    font-weight: 950;
 `;
 
 const Content = styled.main`
@@ -254,16 +235,11 @@ const NewsDetailPage: React.FunctionComponent = () => {
 
     return (
         <DetailPageWrapper>
-            <HeaderPage>
-                <BackButton
-                    aria-label="Quay lại"
-                    onClick={() => navigate("/news", { direction: "backward" })}
-                >
-                    <Icon icon="zi-arrow-left" size={30} />
-                </BackButton>
-
-                <Title>Chi tiết tin tức</Title>
-            </HeaderPage>
+            <AppHeader
+                back
+                title="Chi tiết tin tức"
+                onBack={() => navigate("/news", { direction: "backward" })}
+            />
 
             <Content>
                 {loading && <StateBox>Đang tải chi tiết tin tức...</StateBox>}
@@ -333,6 +309,7 @@ const NewsDetailPage: React.FunctionComponent = () => {
                     </ArticleCard>
                 )}
             </Content>
+            <AppBottomNav />
         </DetailPageWrapper>
     );
 };

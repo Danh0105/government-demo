@@ -1,3 +1,4 @@
+import AppHeader from "@components/layout/AppHeader";
 import React from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
@@ -101,30 +102,6 @@ const PageWrapper = styled(Page)`
         Helvetica, Arial, sans-serif;
 `;
 
-const AppHeader = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-
-    width: min(100vw, 430px);
-    min-height: 96px;
-    padding: calc(16px + var(--zaui-safe-area-inset-top, 0px)) 14px 14px;
-
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-
-    color: #ffffff;
-    background: radial-gradient(
-            circle at 18% 18%,
-            rgba(77, 184, 255, 0.28),
-            transparent 34%
-        ),
-        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
-    box-shadow: 0 10px 26px rgba(0, 50, 95, 0.24);
-`;
-
 const HeaderButton = styled.button`
     width: 42px;
     height: 42px;
@@ -146,17 +123,6 @@ const HeaderButton = styled.button`
         transform: scale(0.94);
         background: rgba(255, 255, 255, 0.24);
     }
-`;
-
-const HeaderTitle = styled.h1`
-    margin: 0 0 4px;
-    flex: 1;
-    min-width: 0;
-
-    font-size: calc(22px * var(--app-font-scale));
-    line-height: 1.08;
-    font-weight: 950;
-    white-space: nowrap;
 `;
 
 const HeaderActions = styled.div`
@@ -422,48 +388,56 @@ const NotificationsPage: React.FunctionComponent = () => {
 
     return (
         <PageWrapper id="notifications-page">
-            <AppHeader>
-                <HeaderButton
-                    aria-label="Quay lại"
-                    onClick={() => navigate("/", { direction: "backward" })}
-                    type="button"
-                >
-                    <Icon icon="zi-arrow-left" size={28} />
-                </HeaderButton>
-
-                <HeaderButton aria-label="Thông báo" type="button">
-                    <Icon icon="zi-notif" size={27} />
-                </HeaderButton>
-
-                <HeaderTitle>Thông báo</HeaderTitle>
-
-                <HeaderActions>
-                    <HeaderButton
-                        aria-label="Tìm kiếm"
-                        onClick={() => navigate("/search")}
-                        type="button"
-                    >
-                        <Icon icon="zi-search" size={27} />
-                    </HeaderButton>
-
-                    <SegmentedActions>
-                        <SegmentButton aria-label="Tùy chọn" type="button">
-                            <span />
-                        </SegmentButton>
-
-                        <SegmentButton
-                            aria-label="Đóng"
+            <AppHeader
+                title="Thông báo"
+                leftSlot={
+                    <>
+                        <HeaderButton
+                            aria-label="Quay lại"
                             onClick={() =>
                                 navigate("/", { direction: "backward" })
                             }
                             type="button"
                         >
-                            <Icon icon="zi-close" size={24} />
-                        </SegmentButton>
-                    </SegmentedActions>
-                </HeaderActions>
-            </AppHeader>
+                            <Icon icon="zi-arrow-left" size={28} />
+                        </HeaderButton>
 
+                        <HeaderButton aria-label="Thông báo" type="button">
+                            <Icon icon="zi-notif" size={27} />
+                        </HeaderButton>
+                    </>
+                }
+                rightSlot={
+                    <HeaderActions>
+                        <HeaderButton
+                            aria-label="Tìm kiếm"
+                            onClick={() => navigate("/search")}
+                            type="button"
+                        >
+                            <Icon icon="zi-search" size={27} />
+                        </HeaderButton>
+
+                        <SegmentedActions>
+                            <SegmentButton
+                                aria-label="Tùy chọn"
+                                type="button"
+                            >
+                                <span />
+                            </SegmentButton>
+
+                            <SegmentButton
+                                aria-label="Đóng"
+                                onClick={() =>
+                                    navigate("/", { direction: "backward" })
+                                }
+                                type="button"
+                            >
+                                <Icon icon="zi-close" size={24} />
+                            </SegmentButton>
+                        </SegmentedActions>
+                    </HeaderActions>
+                }
+            />
             <Content>
                 <Section>
                     <SectionTitle>Thông báo mới</SectionTitle>

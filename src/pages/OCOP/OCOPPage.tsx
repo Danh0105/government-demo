@@ -1,70 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { Icon, Page, useNavigate } from "zmp-ui";
+import { Icon, Page, Spinner, useNavigate } from "zmp-ui";
 import Thumb from "@assets/thumb.png";
-import Background from "@assets/background.png";
-import SocialInsurance from "@assets/social-insurance.png";
-import HeaderPage from "@/components/layout/HeaderPage";
-
-type CategoryId = "all" | "coop" | "regional";
+import AppHeader from "@components/layout/AppHeader";
+import AppBottomNav from "@/components/layout/AppBottomNav";
+import {
+    getOcops,
+    getOcopTypes,
+    type Ocop,
+    type OcopType,
+} from "@/services/ocop";
 
 type Category = {
-    id: CategoryId;
+    id: string;
     label: string;
 };
 
-type Product = {
-    title: string;
-    subtitle: string;
-    badge: string;
-    image: string;
-    category: CategoryId;
-};
-
-const categories: Category[] = [
-    { id: "all", label: "Tất cả" },
-    { id: "coop", label: "Sản phẩm Hợp tác xã" },
-    { id: "regional", label: "Đặc sản vùng" },
-];
-
-const products: Product[] = [
-    {
-        title: "Nem Chua Dài Truyền Thống",
-        subtitle: "Chua dịu chuẩn vị xưa – giữ trọn hương vị miền núi",
-        badge: "OCOP 3★",
-        image: Thumb,
-        category: "coop",
-    },
-    {
-        title: "Nước cốt hoa Atiso",
-        subtitle: "Nước cốt Atiso đỏ không chỉ mang hương vị đặc trưng",
-        badge: "OCOP 4★",
-        image: Background,
-        category: "regional",
-    },
-    {
-        title: "Mắm Tép Chung Thịt Ba Làng TH Tuyến Hòa",
-        subtitle:
-            "Mắm Tép Chung Thịt Ba Làng TH Tuyến Hòa đặc sản truyền thống",
-        badge: "OCOP 3★",
-        image: SocialInsurance,
-        category: "coop",
-    },
-    {
-        title: "Mắm Tôm Đặc Biệt Tuyến Hòa Ba Làng TH",
-        subtitle: "Mắm Tôm đặc biệt với vị đậm đà của quê hương",
-        badge: "OCOP 3★",
-        image: Thumb,
-        category: "regional",
-    },
-    {
-        title: "Nước Mắm Cốt Đặc Biệt Ba Làng TH 400 Năm Truyền Thống",
-        subtitle: "Cốt nước mắm đặc biệt chuẩn vị truyền thống Việt",
-        badge: "OCOP 4★",
-        image: Background,
-        category: "regional",
-    },
-];
+const ALL_CATEGORY_ID = "all";
 
 const PageWrapper = styled(Page)`
     min-height: 100vh;
@@ -77,34 +29,32 @@ const PageWrapper = styled(Page)`
         sans-serif;
 `;
 
-const HeaderTitle = styled.h1`
-    margin: 0;
-    font-size: calc(23px * var(--app-font-scale));
-    line-height: 1.1;
-    font-weight: 900;
-    color: #ffffff;
-`;
-
 const Content = styled.main`
     padding: 0 14px;
 `;
 
 const TabRow = styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
     gap: 9px;
     margin: 16px 0 20px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 `;
 
 const TabButton = styled.button<{ $active?: boolean }>`
-    min-height: 48px;
+    min-height: 44px;
     border: 1px solid ${({ $active }) => ($active ? "#0878bd" : "#d4e6f4")};
-    border-radius: 15px;
-    padding: 10px 8px;
+    border-radius: 999px;
+    padding: 10px 14px;
     font-size: calc(12px * var(--app-font-scale));
     line-height: 1.25;
     font-weight: 800;
     text-align: center;
+    white-space: nowrap;
 
     color: ${({ $active }) => ($active ? "#ffffff" : "#164b78")};
     background: ${({ $active }) =>
@@ -163,6 +113,7 @@ const ProductInfo = styled.div`
     min-width: 0;
     display: grid;
     gap: 6px;
+    flex: 1;
 `;
 
 const ProductName = styled.h2`
@@ -205,8 +156,8 @@ const Badge = styled.span`
     font-weight: 900;
 `;
 
-const EmptyState = styled.div`
-    margin-top: 40px;
+const StateBox = styled.div`
+    margin-top: 28px;
     padding: 32px 18px;
     border-radius: 20px;
     text-align: center;
@@ -217,46 +168,238 @@ const EmptyState = styled.div`
     font-size: calc(15px * var(--app-font-scale));
 `;
 
-const IconButton = styled.button`
-    width: 44px;
-    height: 44px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 14px;
+const LoadingBox = styled(StateBox)`
     display: grid;
+    gap: 12px;
     place-items: center;
-    background: rgba(255, 255, 255, 0.14);
-    color: #ffffff;
-    box-shadow: 0 6px 16px rgba(0, 42, 82, 0.18);
-    backdrop-filter: blur(8px);
-
-    &:active {
-        transform: scale(0.96);
-    }
 `;
+
+function getTypeLabel(type: OcopType) {
+    return type.name ?? type.title ?? "Danh mục OCOP";
+}
+
+function getProductTitle(product: Ocop) {
+    return product.name ?? product.title ?? "Sản phẩm OCOP";
+}
+
+function getProductSubtitle(product: Ocop) {
+    return (
+        product.description ??
+        product.producer ??
+        product.ownerName ??
+        product.address ??
+        "Thông tin sản phẩm OCOP địa phương"
+    );
+}
+
+function getProductImage(product: Ocop) {
+    if (product.imageUrl) {
+        return product.imageUrl;
+    }
+
+    if (Array.isArray(product.images) && product.images[0]) {
+        return product.images[0];
+    }
+
+    return Thumb;
+}
+
+function getProductBadge(product: Ocop) {
+    const star = product.stars ?? product.rating;
+
+    if (star) {
+        return `OCOP ${star}★`;
+    }
+
+    return "OCOP";
+}
+
+function getProductTypeId(product: Ocop) {
+    return product.typeId ?? product.ocopType?.id ?? "";
+}
 
 const OCOPPage: React.FC = () => {
     const navigate = useNavigate();
-    const [selectedCategory, setSelectedCategory] = useState<CategoryId>("all");
 
-    const filteredProducts = useMemo(
-        () =>
-            selectedCategory === "all"
-                ? products
-                : products.filter(
-                      product => product.category === selectedCategory,
-                  ),
-        [selectedCategory],
+    const [selectedCategory, setSelectedCategory] =
+        useState<string>(ALL_CATEGORY_ID);
+
+    const [types, setTypes] = useState<OcopType[]>([]);
+    const [products, setProducts] = useState<Ocop[]>([]);
+
+    const [loadingTypes, setLoadingTypes] = useState(false);
+    const [loadingProducts, setLoadingProducts] = useState(false);
+    const [error, setError] = useState("");
+
+    const categories = useMemo<Category[]>(
+        () => [
+            {
+                id: ALL_CATEGORY_ID,
+                label: "Tất cả",
+            },
+            ...types.map(type => ({
+                id: type.id,
+                label: getTypeLabel(type),
+            })),
+        ],
+        [types],
     );
+
+    const filteredProducts = useMemo(() => {
+        if (selectedCategory === ALL_CATEGORY_ID) {
+            return products;
+        }
+
+        return products.filter(
+            product => getProductTypeId(product) === selectedCategory,
+        );
+    }, [products, selectedCategory]);
+
+    useEffect(() => {
+        let active = true;
+
+        async function loadTypes() {
+            try {
+                setLoadingTypes(true);
+                setError("");
+
+                const data = await getOcopTypes();
+
+                if (!active) {
+                    return;
+                }
+
+                setTypes(data);
+            } catch (err) {
+                if (!active) {
+                    return;
+                }
+
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : "Không thể tải danh mục OCOP.",
+                );
+            } finally {
+                if (active) {
+                    setLoadingTypes(false);
+                }
+            }
+        }
+
+        loadTypes();
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+
+        async function loadProducts() {
+            try {
+                setLoadingProducts(true);
+                setError("");
+
+                const typeId =
+                    selectedCategory === ALL_CATEGORY_ID
+                        ? undefined
+                        : selectedCategory;
+
+                const result = await getOcops({
+                    page: 0,
+                    size: 20,
+                    typeId,
+                });
+
+                if (!active) {
+                    return;
+                }
+
+                setProducts(result.data);
+            } catch (err) {
+                if (!active) {
+                    return;
+                }
+
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : "Không thể tải danh sách sản phẩm OCOP.",
+                );
+                setProducts([]);
+            } finally {
+                if (active) {
+                    setLoadingProducts(false);
+                }
+            }
+        }
+
+        loadProducts();
+
+        return () => {
+            active = false;
+        };
+    }, [selectedCategory]);
+
+    let content: React.ReactNode;
+
+    if (loadingTypes || loadingProducts) {
+        content = (
+            <LoadingBox>
+                <Spinner />
+                Đang tải sản phẩm OCOP...
+            </LoadingBox>
+        );
+    } else if (error) {
+        content = <StateBox>{error}</StateBox>;
+    } else if (filteredProducts.length > 0) {
+        content = (
+            <ProductList>
+                {filteredProducts.map(product => (
+                    <ProductCard
+                        key={product.id}
+                        onClick={() => navigate(`/ocops/${product.id}`)}
+                        type="button"
+                    >
+                        <ProductImage $image={getProductImage(product)} />
+
+                        <ProductInfo>
+                            <ProductName>
+                                {getProductTitle(product)}
+                            </ProductName>
+
+                            <ProductSubtitle>
+                                {getProductSubtitle(product)}
+                            </ProductSubtitle>
+
+                            <ProductFooter>
+                                <Badge>{getProductBadge(product)}</Badge>
+
+                                <Icon icon="zi-chevron-right" size={18} />
+                            </ProductFooter>
+                        </ProductInfo>
+                    </ProductCard>
+                ))}
+            </ProductList>
+        );
+    } else {
+        content = (
+            <ProductList>
+                <StateBox>Chưa có sản phẩm OCOP phù hợp.</StateBox>
+            </ProductList>
+        );
+    }
 
     return (
         <PageWrapper>
-            <HeaderPage>
-                <IconButton onClick={() => navigate(-1)}>
-                    <Icon icon="zi-arrow-left" size={20} />
-                </IconButton>
-                <HeaderTitle>Sản phẩm</HeaderTitle>
-                <div style={{ width: 48 }} />
-            </HeaderPage>
+            <AppHeader
+                back
+                title="Sản phẩm"
+                description="Khám phá sản phẩm OCOP, đặc sản vùng và sản phẩm hợp tác xã"
+                onBack={() => navigate(-1)}
+            />
 
             <Content>
                 <TabRow>
@@ -265,37 +408,17 @@ const OCOPPage: React.FC = () => {
                             key={category.id}
                             $active={category.id === selectedCategory}
                             onClick={() => setSelectedCategory(category.id)}
+                            type="button"
                         >
                             {category.label}
                         </TabButton>
                     ))}
                 </TabRow>
 
-                <ProductList>
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map(product => (
-                            <ProductCard key={product.title}>
-                                <ProductImage $image={product.image} />
-                                <ProductInfo>
-                                    <ProductName>{product.title}</ProductName>
-                                    <ProductSubtitle>
-                                        {product.subtitle}
-                                    </ProductSubtitle>
-                                    <ProductFooter>
-                                        <Badge>{product.badge}</Badge>
-                                        <Icon
-                                            icon="zi-chevron-right"
-                                            size={18}
-                                        />
-                                    </ProductFooter>
-                                </ProductInfo>
-                            </ProductCard>
-                        ))
-                    ) : (
-                        <EmptyState>Không có sản phẩm phù hợp.</EmptyState>
-                    )}
-                </ProductList>
+                {content}
             </Content>
+
+            <AppBottomNav />
         </PageWrapper>
     );
 };

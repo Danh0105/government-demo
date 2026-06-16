@@ -1,52 +1,76 @@
+import AppHeader from "@components/layout/AppHeader";
 import PageLayout from "@components/layout/PageLayout";
-import CompanyLogo from "@assets/logo.png";
 import Avatar from "@assets/avatar.png";
 import React, { FC, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
+import { User } from "@dts";
 import { useStore } from "@store";
 import ProfileInfo from "./ProfileInfo";
+import AppBottomNav from "@/components/layout/AppBottomNav";
+import account from "@/assets/icons/user.png";
+import privacy from "@/assets/icons/security.png";
+import points from "@/assets/icons/medal.png";
+import history from "@/assets/icons/history.png";
+import call from "@/assets/icons/phone.png";
 
 type MenuItem = {
     label: string;
-    icon: React.ComponentProps<typeof Icon>["icon"];
+    icon?: React.ComponentProps<typeof Icon>["icon"];
+    image?: string;
     path?: string;
+    action?: "logout";
     danger?: boolean;
-};
-
-type NavItem = {
-    label: string;
-    icon: React.ComponentProps<typeof Icon>["icon"];
-    path: string;
-    active?: boolean;
+    showChevron?: boolean;
 };
 
 const accountMenu: MenuItem[] = [
-    { label: "Thông tin tài khoản", icon: "zi-user" },
-    { label: "Điểm tích lũy", icon: "zi-star" },
-    { label: "Lịch sử đồng bộ", icon: "zi-refresh" },
-    { label: "Lịch sử xem bài viết", icon: "zi-clock-1", path: "/news" },
-    { label: "Lịch sử đặt chỗ sự kiện", icon: "zi-calendar" },
     {
-        label: "Lịch sử phản ánh / khiếu nại",
-        icon: "zi-file",
-        path: "/feedbacks",
+        label: "Thông tin tài khoản",
+        image: account,
+        path: "/account-info",
     },
-    { label: "Jobs đã ứng tuyển", icon: "zi-more-grid", path: "/jobs" },
-    { label: "Đăng ký nhận việc", icon: "zi-notif" },
-    { label: "Hồ sơ tìm việc", icon: "zi-search" },
-    { label: "Chính sách bảo mật", icon: "zi-warning" },
-    { label: "Liên hệ chính quyền", icon: "zi-call" },
-    { label: "Đăng xuất", icon: "zi-arrow-right", danger: true },
+    {
+        label: "Điểm tích lũy",
+        image: points,
+        path: "/loyalty-points",
+    },
+    {
+        label: "Lịch sử đồng bộ",
+        image: history,
+        path: "/sync-history",
+    },
+    {
+        label: "Chính sách bảo mật",
+        image: privacy,
+        path: "/privacy-policy",
+    },
+    {
+        label: "Liên hệ chính quyền",
+        image: call,
+        path: "/government-contact",
+    },
+    {
+        label: "Đăng xuất",
+        icon: "zi-arrow-right",
+        action: "logout",
+        danger: true,
+    },
 ];
 
-const navItems: NavItem[] = [
-    { label: "Trang chủ", icon: "zi-home", path: "/" },
-    { label: "Tin tức", icon: "zi-note", path: "/news" },
-    { label: "Cộng đồng", icon: "zi-chat", path: "/feedbacks" },
-    { label: "Thông báo", icon: "zi-notif", path: "/notifications" },
-    { label: "Tài khoản", icon: "zi-user", path: "/profile", active: true },
+const guestMenu: MenuItem[] = [
+    {
+        label: "Chính sách bảo mật",
+        image: privacy,
+        path: "/privacy-policy",
+        showChevron: true,
+    },
+    {
+        label: "Liên hệ chính quyền",
+        image: call,
+        path: "/government-contact",
+    },
 ];
 
 const ICON_SIZE = {
@@ -61,42 +85,10 @@ const AccountPage = styled(Page)`
     max-width: 430px;
     margin: 0 auto;
     padding: 112px 0 104px;
-
-    background: radial-gradient(
-            circle at 28px 130px,
-            rgba(0, 87, 160, 0.12),
-            transparent 150px
-        ),
-        linear-gradient(180deg, #eef7ff 0, #f7fbff 258px, #f5f7fb 100%);
-
+    background: #fbfbfc;
     color: #172033;
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         Helvetica, Arial, sans-serif;
-`;
-
-const AccountHeader = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-
-    width: min(100vw, 430px);
-    min-height: 96px;
-    padding: calc(16px + var(--zaui-safe-area-inset-top, 0px)) 14px 14px;
-
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-
-    color: #ffffff;
-    background: radial-gradient(
-            circle at 18% 18%,
-            rgba(77, 184, 255, 0.28),
-            transparent 34%
-        ),
-        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
-
-    box-shadow: 0 10px 26px rgba(0, 50, 95, 0.24);
 `;
 
 const HeaderIcon = styled.div`
@@ -107,13 +99,6 @@ const HeaderIcon = styled.div`
     place-items: center;
     background: rgba(255, 255, 255, 0.16);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-`;
-
-const HeaderTitle = styled.h1`
-    margin: 0 0 3px;
-    font-size: calc(28px * var(--app-font-scale));
-    line-height: 1.08;
-    font-weight: 950;
 `;
 
 const Content = styled.main`
@@ -178,6 +163,62 @@ const Points = styled.div`
     }
 `;
 
+const GuestCard = styled.section`
+    min-height: 124px;
+    border: 1px solid #e7e9ee;
+    border-radius: 22px;
+    padding: 22px 18px;
+    display: grid;
+    grid-template-columns: 86px 1fr;
+    gap: 8px;
+    align-items: center;
+    background: #ffffff;
+    box-shadow: 0 6px 14px rgba(18, 28, 45, 0.08);
+`;
+
+const GuestAvatar = styled.div`
+    width: 68px;
+    height: 68px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: #98a2b3;
+    background: #f0f1f5;
+`;
+
+const GuestTitle = styled.h3`
+    margin: 0;
+    color: #1f2937;
+    font-size: calc(23px * var(--app-font-scale));
+    line-height: 1.15;
+    font-weight: 900;
+`;
+
+const GuestDescription = styled.p`
+    margin: 6px 0 13px;
+    color: #9aa1ad;
+    font-size: calc(18px * var(--app-font-scale));
+    line-height: 1.2;
+    font-weight: 650;
+`;
+
+const LoginButton = styled.button`
+    min-height: 40px;
+    border: 0;
+    border-radius: 999px;
+    padding: 0 18px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #e50920, #f22433);
+    box-shadow: 0 4px 10px rgba(229, 9, 32, 0.22);
+    font-size: calc(17px * var(--app-font-scale));
+    line-height: 1.1;
+    font-weight: 900;
+
+    &:disabled {
+        opacity: 0.72;
+    }
+`;
+
 const MenuList = styled.div`
     display: grid;
     gap: 14px;
@@ -217,6 +258,19 @@ const MenuIcon = styled.span<{ $danger?: boolean }>`
         $danger ? "rgba(255, 218, 214, 0.82)" : "rgba(230, 247, 255, 0.94)"};
 `;
 
+const MenuIconImage = styled.img`
+    width: 30px;
+    height: 30px;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 7px rgba(0, 86, 153, 0.16));
+`;
+
+const GuestMenuIcon = styled(MenuIcon)`
+    color: #7f8793;
+    background: #f5f6f8;
+`;
+
 const MenuLabel = styled.span`
     min-width: 0;
     font-size: calc(21px * var(--app-font-scale));
@@ -230,205 +284,162 @@ const Chevron = styled.span`
     color: #98a2b3;
 `;
 
-const FloatingActions = styled.div`
-    position: fixed;
-    right: max(16px, calc((100vw - 430px) / 2 + 16px));
-    bottom: calc(96px + var(--zaui-safe-area-inset-bottom, 0px));
-    z-index: 21;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-`;
+interface AccountMenuPageProps {
+    user?: User;
+    loadingUserInfo?: boolean;
+    onLogin: () => void;
+    onLogout: () => void;
+}
 
-const FloatingButton = styled.button`
-    width: 58px;
-    height: 58px;
-    border: 0;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: linear-gradient(135deg, #005b9f, #008bd2);
-    box-shadow: 0 14px 26px rgba(0, 91, 159, 0.28);
-`;
-
-const BottomNav = styled.nav`
-    position: fixed;
-    inset: auto auto 0 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-
-    width: min(100vw, 430px);
-    height: calc(76px + var(--zaui-safe-area-inset-bottom, 0px));
-    padding-bottom: var(--zaui-safe-area-inset-bottom, 0px);
-
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-
-    background: rgba(255, 255, 255, 0.97);
-    border-top: 1px solid rgba(0, 83, 145, 0.08);
-    box-shadow: 0 -8px 24px rgba(30, 35, 50, 0.08);
-    backdrop-filter: blur(18px);
-`;
-
-const BottomNavLogo = styled.div`
-    position: absolute;
-    left: 50%;
-    top: -30px;
-    transform: translateX(-50%);
-    z-index: 3;
-
-    width: 94px;
-    height: 16px;
-    display: grid;
-    place-items: center;
-    padding: 5px 10px;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(0, 83, 145, 0.08);
-    border-bottom: 0;
-    border-radius: 18px 18px 0 0;
-    box-shadow: 0 -5px 14px rgba(0, 75, 134, 0.1);
-
-    &::after {
-        content: "";
-        position: absolute;
-        left: -1px;
-        right: -1px;
-        bottom: -16px;
-        height: 18px;
-        background: rgba(255, 255, 255, 0.94);
-    }
-`;
-
-const BottomNavLogoImage = styled.img`
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
-    opacity: 0.86;
-`;
-
-const NavButton = styled.button<{ $active?: boolean }>`
-    position: relative;
-    border: 0;
-    background: ${({ $active }) =>
-        $active ? "rgba(0, 99, 167, 0.1)" : "transparent"};
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    color: ${({ $active }) => ($active ? "#0063a7" : "#98a2b3")};
-    font-size: calc(11px * var(--app-font-scale));
-    line-height: 1.15;
-    font-weight: ${({ $active }) => ($active ? 800 : 550)};
-    transition: color 160ms ease, transform 160ms ease;
-
-    &:active {
-        transform: scale(0.94);
-    }
-
-    &:nth-of-type(3) {
-        justify-content: flex-end;
-        padding-bottom: 10px;
-    }
-
-    &:nth-of-type(3) svg {
-        display: none;
-    }
-`;
-
-const AccountMenuPage: FC = () => {
+const AccountMenuPage: FC<AccountMenuPageProps> = ({
+    user,
+    loadingUserInfo,
+    onLogin,
+    onLogout,
+}) => {
     const navigate = useNavigate();
+    const isLoggedIn = Boolean(user);
+    const menuItems = isLoggedIn ? accountMenu : guestMenu;
 
     const handleMenuClick = (item: MenuItem) => {
+        if (item.action === "logout") {
+            onLogout();
+            return;
+        }
+
         if (item.path) {
             navigate(item.path);
         }
     };
 
+    const renderMenuIcon = (item: MenuItem) => {
+        if (item.image) {
+            return <MenuIconImage src={item.image} alt="" />;
+        }
+
+        if (item.icon) {
+            return <Icon icon={item.icon} size={ICON_SIZE.menu} />;
+        }
+
+        return null;
+    };
+
+    const getShouldShowChevron = (item: MenuItem) => {
+        if (isLoggedIn) {
+            return !item.danger;
+        }
+
+        return Boolean(item.showChevron || item.icon === "zi-call");
+    };
+
     return (
         <AccountPage id="profile-page">
-            <AccountHeader>
-                <HeaderIcon>
-                    <Icon icon="zi-user" size={ICON_SIZE.header} />
-                </HeaderIcon>
-                <HeaderTitle>Tài khoản</HeaderTitle>
-            </AccountHeader>
+            <AppHeader
+                title="Tài khoản"
+                leftSlot={
+                    <HeaderIcon>
+                        <Icon icon="zi-user" size={ICON_SIZE.header} />
+                    </HeaderIcon>
+                }
+            />
 
             <Content>
                 <PageTitle>Menu tài khoản</PageTitle>
 
-                <ProfileCard type="button">
-                    <AvatarImage src={Avatar} alt="Ảnh đại diện" />
-                    <div>
-                        <ProfileName>Danh</ProfileName>
-                        <Points>
-                            <Icon icon="zi-star" size={18} />
-                            100 điểm
-                        </Points>
-                    </div>
-                    <Chevron>
-                        <Icon icon="zi-chevron-right" size={24} />
-                    </Chevron>
-                </ProfileCard>
+                {isLoggedIn ? (
+                    <ProfileCard
+                        type="button"
+                        onClick={() => navigate("/account-info")}
+                    >
+                        <AvatarImage
+                            src={user?.avatar || Avatar}
+                            alt="Ảnh đại diện"
+                        />
+
+                        <div>
+                            <ProfileName>
+                                {user?.name || "Người dùng"}
+                            </ProfileName>
+
+                            <Points>
+                                <Icon icon="zi-star" size={18} />
+                                100 điểm
+                            </Points>
+                        </div>
+
+                        <Chevron>
+                            <Icon icon="zi-chevron-right" size={24} />
+                        </Chevron>
+                    </ProfileCard>
+                ) : (
+                    <GuestCard>
+                        <GuestAvatar>
+                            <Icon icon="zi-user" size={34} />
+                        </GuestAvatar>
+
+                        <div>
+                            <GuestTitle>Xin chào, Khách!</GuestTitle>
+
+                            <GuestDescription>
+                                Đăng ký để trải nghiệm đầy đủ
+                            </GuestDescription>
+
+                            <LoginButton
+                                disabled={loadingUserInfo}
+                                onClick={onLogin}
+                                type="button"
+                            >
+                                {loadingUserInfo
+                                    ? "Đang đăng nhập..."
+                                    : "Đăng nhập/Đăng ký"}
+                            </LoginButton>
+                        </div>
+                    </GuestCard>
+                )}
 
                 <MenuList>
-                    {accountMenu.map(item => (
-                        <MenuButton
-                            key={item.label}
-                            type="button"
-                            $danger={item.danger}
-                            onClick={() => handleMenuClick(item)}
-                        >
-                            <MenuIcon $danger={item.danger}>
-                                <Icon icon={item.icon} size={ICON_SIZE.menu} />
-                            </MenuIcon>
-                            <MenuLabel>{item.label}</MenuLabel>
-                            {!item.danger && (
-                                <Chevron>
-                                    <Icon icon="zi-chevron-right" size={24} />
-                                </Chevron>
-                            )}
-                        </MenuButton>
-                    ))}
+                    {menuItems.map(item => {
+                        const shouldShowChevron = getShouldShowChevron(item);
+                        const IconWrapper = isLoggedIn
+                            ? MenuIcon
+                            : GuestMenuIcon;
+
+                        return (
+                            <MenuButton
+                                key={item.label}
+                                type="button"
+                                $danger={item.danger}
+                                onClick={() => handleMenuClick(item)}
+                            >
+                                <IconWrapper $danger={item.danger}>
+                                    {renderMenuIcon(item)}
+                                </IconWrapper>
+
+                                <MenuLabel>{item.label}</MenuLabel>
+
+                                {shouldShowChevron && (
+                                    <Chevron>
+                                        <Icon
+                                            icon="zi-chevron-right"
+                                            size={24}
+                                        />
+                                    </Chevron>
+                                )}
+                            </MenuButton>
+                        );
+                    })}
                 </MenuList>
             </Content>
 
-            <FloatingActions>
-                <FloatingButton type="button" aria-label="Mở rộng">
-                    <Icon icon="zi-arrow-up" size={ICON_SIZE.floating} />
-                </FloatingButton>
-                <FloatingButton type="button" aria-label="Trò chuyện">
-                    <Icon icon="zi-chat" size={ICON_SIZE.floating} />
-                </FloatingButton>
-            </FloatingActions>
-
-            <BottomNav>
-                <BottomNavLogo aria-label="Logo công ty">
-                    <BottomNavLogoImage src={CompanyLogo} alt="Logo công ty" />
-                </BottomNavLogo>
-
-                {navItems.map(item => (
-                    <NavButton
-                        key={item.label}
-                        type="button"
-                        $active={item.active}
-                        onClick={() => navigate(item.path)}
-                    >
-                        <Icon icon={item.icon} size={ICON_SIZE.nav} />
-                        <span>{item.label}</span>
-                    </NavButton>
-                ))}
-            </BottomNav>
+            <AppBottomNav />
         </AccountPage>
     );
 };
 
 const ProfilePage: FC = () => {
-    const { profile, getProfile } = useStore();
+    const { profile, getProfile, user, loadingUserInfo, getUserInfo, logout } =
+        useStore();
+
     const [searchParams] = useSearchParams();
     const id = searchParams.get("id");
 
@@ -439,7 +450,14 @@ const ProfilePage: FC = () => {
     }, [getProfile, id]);
 
     if (!id) {
-        return <AccountMenuPage />;
+        return (
+            <AccountMenuPage
+                user={user}
+                loadingUserInfo={loadingUserInfo}
+                onLogin={getUserInfo}
+                onLogout={logout}
+            />
+        );
     }
 
     return (

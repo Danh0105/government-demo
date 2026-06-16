@@ -4,9 +4,9 @@ import {
     GetArticlesParams,
     getOrganization,
     GetOrganizationParams,
-} from "@service/services.mock";
+} from "@/services/services.mock";
 
-import { followOfficialAccount } from "@service/zalo";
+import { followOfficialAccount } from "@/services/zalo";
 import { StateCreator } from "zustand";
 
 export interface OrganizationSlice {

@@ -11,6 +11,12 @@ if (!API_BASE_URL) {
 
 export type FeedbackStatus = "PENDING" | "PROCESSING" | "RESOLVED" | "REJECTED";
 
+export type ApiResponse<T> = {
+    success: boolean;
+    message: string;
+    data: T;
+};
+
 export type Feedback = {
     id: string;
     title: string;
@@ -27,13 +33,10 @@ export type Feedback = {
     createdAt?: string;
     updatedAt?: string;
 };
-export type ApiResponse<T> = {
-    success: boolean;
-    message: string;
-    data: T;
-};
+
 export type CreateFeedbackTypePayload = {
     title: string;
+    name?: string;
     description?: string;
     order?: number;
 };
@@ -60,6 +63,7 @@ export type UpdateFeedbackPayload = Partial<
 
 export type FeedbackQuery = {
     page?: number;
+    size?: number;
     limit?: number;
     keyword?: string;
     status?: FeedbackStatus;
@@ -70,7 +74,17 @@ export type PaginatedResponse<T> = {
     data: T[];
     total: number;
     page: number;
-    limit: number;
+    size: number;
+    totalPages?: number;
+};
+
+type RawPaginatedResponse<T> = {
+    data?: T[];
+    items?: T[];
+    total?: number;
+    page?: number;
+    size?: number;
+    limit?: number;
     totalPages?: number;
 };
 
@@ -86,13 +100,23 @@ function getHeaders(hasJsonBody = false): Record<string, string> {
     return headers;
 }
 
-function buildQuery(params: Record<string, unknown>) {
+function buildQuery(params: FeedbackQuery = {}) {
     const searchParams = new URLSearchParams();
 
     Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-            searchParams.set(key, String(value));
+        if (value === undefined || value === null || value === "") {
+            return;
         }
+
+        if (key === "limit") {
+            if (!params.size) {
+                searchParams.set("size", String(value));
+            }
+
+            return;
+        }
+
+        searchParams.set(key, String(value));
     });
 
     const queryString = searchParams.toString();
@@ -126,11 +150,87 @@ async function handleResponse<T>(response: Response): Promise<T> {
         throw new Error(message);
     }
 
-    if (!text) {
+    if (response.status === 204 || !text) {
         return undefined as T;
     }
 
     return JSON.parse(text) as T;
+}
+
+function isApiResponse<T>(value: unknown): value is ApiResponse<T> {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "success" in value &&
+        "message" in value &&
+        "data" in value
+    );
+}
+
+function unwrapApiResponse<T>(value: T | ApiResponse<T>): T {
+    if (isApiResponse<T>(value)) {
+        return value.data;
+    }
+
+    return value as T;
+}
+
+function normalizeFeedbackType(value: unknown): FeedbackType {
+    const data = unwrapApiResponse<unknown>(value as ApiResponse<unknown>);
+
+    return data as FeedbackType;
+}
+
+function normalizeFeedbackTypes(value: unknown): FeedbackType[] {
+    const data = unwrapApiResponse<unknown>(value as ApiResponse<unknown>);
+
+    if (Array.isArray(data)) {
+        return data as FeedbackType[];
+    }
+
+    return [];
+}
+
+function normalizeFeedback(value: unknown): Feedback {
+    const data = unwrapApiResponse<unknown>(value as ApiResponse<unknown>);
+
+    return data as Feedback;
+}
+
+function normalizeFeedbackList(value: unknown): PaginatedResponse<Feedback> {
+    const data = unwrapApiResponse<unknown>(value as ApiResponse<unknown>);
+
+    if (Array.isArray(data)) {
+        return {
+            data,
+            total: data.length,
+            page: 0,
+            size: data.length,
+            totalPages: 1,
+        };
+    }
+
+    if (typeof data === "object" && data !== null) {
+        const body = data as RawPaginatedResponse<Feedback>;
+        const items = body.data ?? body.items ?? [];
+        const size = body.size ?? body.limit ?? items.length;
+
+        return {
+            data: Array.isArray(items) ? items : [],
+            total: body.total ?? items.length,
+            page: body.page ?? 0,
+            size,
+            totalPages: body.totalPages,
+        };
+    }
+
+    return {
+        data: [],
+        total: 0,
+        page: 0,
+        size: 0,
+        totalPages: 0,
+    };
 }
 
 /* =========================================================
@@ -143,19 +243,20 @@ export async function getFeedbackTypes(): Promise<FeedbackType[]> {
         headers: getHeaders(),
     });
 
-    const result = await handleResponse<ApiResponse<FeedbackType[]>>(response);
+    const result = await handleResponse<unknown>(response);
 
-    return result.data;
+    return normalizeFeedbackTypes(result);
 }
 
 export async function getFeedbackType(id: string): Promise<FeedbackType> {
     const response = await fetch(`${API_BASE_URL}/feedback-types/${id}`, {
         method: "GET",
         headers: getHeaders(),
-        cache: "no-store",
     });
 
-    return handleResponse<FeedbackType>(response);
+    const result = await handleResponse<unknown>(response);
+
+    return normalizeFeedbackType(result);
 }
 
 export async function createFeedbackType(
@@ -164,10 +265,15 @@ export async function createFeedbackType(
     const response = await fetch(`${API_BASE_URL}/feedback-types`, {
         method: "POST",
         headers: getHeaders(true),
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+            ...payload,
+            name: payload.name ?? payload.title,
+        }),
     });
 
-    return handleResponse<FeedbackType>(response);
+    const result = await handleResponse<unknown>(response);
+
+    return normalizeFeedbackType(result);
 }
 
 export async function updateFeedbackType(
@@ -177,10 +283,15 @@ export async function updateFeedbackType(
     const response = await fetch(`${API_BASE_URL}/feedback-types/${id}`, {
         method: "PATCH",
         headers: getHeaders(true),
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+            ...payload,
+            name: payload.name ?? payload.title,
+        }),
     });
 
-    return handleResponse<FeedbackType>(response);
+    const result = await handleResponse<unknown>(response);
+
+    return normalizeFeedbackType(result);
 }
 
 export async function deleteFeedbackType(id: string): Promise<void> {
@@ -189,7 +300,7 @@ export async function deleteFeedbackType(id: string): Promise<void> {
         headers: getHeaders(),
     });
 
-    return handleResponse<void>(response);
+    await handleResponse<unknown>(response);
 }
 
 /* =========================================================
@@ -198,27 +309,29 @@ export async function deleteFeedbackType(id: string): Promise<void> {
 
 export async function getFeedbacks(
     query: FeedbackQuery = {},
-): Promise<PaginatedResponse<Feedback> | Feedback[]> {
+): Promise<PaginatedResponse<Feedback>> {
     const response = await fetch(
         `${API_BASE_URL}/feedbacks${buildQuery(query)}`,
         {
             method: "GET",
             headers: getHeaders(),
-            cache: "no-store",
         },
     );
 
-    return handleResponse<PaginatedResponse<Feedback> | Feedback[]>(response);
+    const result = await handleResponse<unknown>(response);
+
+    return normalizeFeedbackList(result);
 }
 
 export async function getFeedback(id: string): Promise<Feedback> {
     const response = await fetch(`${API_BASE_URL}/feedbacks/${id}`, {
         method: "GET",
         headers: getHeaders(),
-        cache: "no-store",
     });
 
-    return handleResponse<Feedback>(response);
+    const result = await handleResponse<unknown>(response);
+
+    return normalizeFeedback(result);
 }
 
 export async function createFeedback(
@@ -230,9 +343,9 @@ export async function createFeedback(
         body: JSON.stringify(payload),
     });
 
-    const result = await handleResponse<ApiResponse<Feedback>>(response);
+    const result = await handleResponse<unknown>(response);
 
-    return result.data;
+    return normalizeFeedback(result);
 }
 
 export async function updateFeedback(
@@ -245,7 +358,9 @@ export async function updateFeedback(
         body: JSON.stringify(payload),
     });
 
-    return handleResponse<Feedback>(response);
+    const result = await handleResponse<unknown>(response);
+
+    return normalizeFeedback(result);
 }
 
 export async function deleteFeedback(id: string): Promise<void> {
@@ -254,5 +369,5 @@ export async function deleteFeedback(id: string): Promise<void> {
         headers: getHeaders(),
     });
 
-    return handleResponse<void>(response);
+    await handleResponse<unknown>(response);
 }

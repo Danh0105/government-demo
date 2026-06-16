@@ -1,6 +1,6 @@
 import { RATE_LIMIT_CODE } from "@constants";
 import { AppError, Profile } from "@dts";
-import { searchProfiles, SearchProfileParams } from "@service/services.mock";
+import { searchProfiles, SearchProfileParams } from "@/services/services.mock";
 import { StateCreator } from "zustand";
 import { OrganizationSlice } from "./organizationSlice";
 import { AppSlice } from "./appSlice";

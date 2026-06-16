@@ -1,12 +1,21 @@
-import { Feedback } from "@dts";
-import { useStore } from "@store";
+import AppHeader from "@components/layout/AppHeader";
+import {
+    getFeedbacks,
+    type Feedback,
+    type PaginatedResponse,
+} from "@/services/feedback";
 import { formatDateTime } from "@utils/date-time";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
 import CreateFeedbackForm from "./CreateFeedbackForm";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 type FeedbackStatus =
+    | "PENDING"
+    | "PROCESSING"
+    | "RESOLVED"
+    | "REJECTED"
     | "processing"
     | "resolved"
     | "received"
@@ -14,11 +23,12 @@ type FeedbackStatus =
     | string;
 
 const statusLabels: Record<string, string> = {
+    PENDING: "Đã tiếp nhận",
     PROCESSING: "Đang xử lý",
     RESOLVED: "Đã xử lý",
-    RECEIVED: "Đã tiếp nhận",
     REJECTED: "Từ chối",
 
+    pending: "Đã tiếp nhận",
     processing: "Đang xử lý",
     resolved: "Đã xử lý",
     received: "Đã tiếp nhận",
@@ -38,6 +48,16 @@ const statusStyles: Record<
         border: string;
     }
 > = {
+    pending: {
+        background: "#eaf4ff",
+        color: "#0067b1",
+        border: "#c7e1f8",
+    },
+    received: {
+        background: "#eaf4ff",
+        color: "#0067b1",
+        border: "#c7e1f8",
+    },
     processing: {
         background: "#fff7df",
         color: "#a86405",
@@ -47,11 +67,6 @@ const statusStyles: Record<
         background: "#e8f8ef",
         color: "#138849",
         border: "#bfe9ce",
-    },
-    received: {
-        background: "#eaf4ff",
-        color: "#0067b1",
-        border: "#c7e1f8",
     },
     rejected: {
         background: "#fef2f2",
@@ -70,60 +85,6 @@ const PageWrapper = styled(Page)`
     color: #10233b;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const TopHeader = styled.header`
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    padding: 14px 16px 18px;
-    color: #ffffff;
-    background: linear-gradient(135deg, #064f88 0%, #0075b8 100%);
-    border-radius: 0 0 24px 24px;
-    box-shadow: 0 10px 24px rgba(0, 84, 142, 0.2);
-`;
-
-const HeaderRow = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-`;
-
-const BackButton = styled.button`
-    width: 42px;
-    height: 42px;
-    flex: none;
-    display: grid;
-    place-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 14px;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.12);
-    transition: 0.2s ease;
-
-    &:active {
-        transform: scale(0.94);
-        background: rgba(255, 255, 255, 0.2);
-    }
-`;
-
-const HeaderContent = styled.div`
-    min-width: 0;
-`;
-
-const HeaderTitle = styled.h1`
-    margin: 0;
-    font-size: calc(20px * var(--app-font-scale));
-    line-height: 1.2;
-    font-weight: 900;
-`;
-
-const HeaderDescription = styled.p`
-    margin: 3px 0 0;
-    color: rgba(255, 255, 255, 0.82);
-    font-size: calc(12px * var(--app-font-scale));
-    line-height: 1.35;
-    font-weight: 600;
 `;
 
 const Content = styled.main`
@@ -189,6 +150,25 @@ const RefreshButton = styled.button`
     &:active {
         transform: scale(0.96);
         background: #edf7ff;
+    }
+
+    &:disabled {
+        opacity: 0.72;
+    }
+`;
+
+const Spinner = styled.span`
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(0, 105, 171, 0.25);
+    border-top-color: #0069ab;
+    border-radius: 999px;
+    animation: spin 0.8s linear infinite;
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 `;
 
@@ -328,6 +308,12 @@ const EmptyState = styled.div`
     line-height: 1.55;
 `;
 
+const ErrorState = styled(EmptyState)`
+    color: #b42318;
+    border-color: #fecaca;
+    background: #fff7f7;
+`;
+
 const CreateAction = styled.div`
     position: fixed;
     right: max(16px, calc((100vw - 430px) / 2 + 16px));
@@ -463,49 +449,31 @@ const PopupCloseButton = styled.button`
     }
 `;
 
-const BottomNav = styled.nav`
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 50%;
-    z-index: 22;
-    display: grid;
-    width: min(100vw, 430px);
-    height: 68px;
-    grid-template-columns: repeat(5, 1fr);
-    transform: translateX(-50%);
-    border-top: 1px solid #dce8f1;
-    background: rgba(255, 255, 255, 0.97);
-    box-shadow: 0 -6px 18px rgba(31, 77, 110, 0.08);
-`;
-
-const NavItem = styled.button<{ $active?: boolean }>`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    border: 0;
-    color: ${({ $active }) => ($active ? "#0070b5" : "#9aaabb")};
-    background: transparent;
-    font-size: calc(10px * var(--app-font-scale));
-    line-height: 1.1;
-    font-weight: ${({ $active }) => ($active ? 850 : 650)};
-
-    &:active {
-        background: #f0f8fd;
-    }
-`;
-
 const normalizeStatus = (status?: string) => {
     if (!status) {
-        return "received";
+        return "pending";
     }
 
     const lower = status.toLowerCase();
 
+    if (lower === "pending") {
+        return "pending";
+    }
+
+    if (lower === "processing") {
+        return "processing";
+    }
+
+    if (lower === "resolved") {
+        return "resolved";
+    }
+
+    if (lower === "rejected") {
+        return "rejected";
+    }
+
     if (lower === "da_tiep_nhan") {
-        return "received";
+        return "pending";
     }
 
     if (lower === "dang_xu_ly") {
@@ -532,19 +500,68 @@ const normalizeStatus = (status?: string) => {
         return "rejected";
     }
 
-    if (lower.includes("receive") || lower.includes("pending")) {
-        return "received";
+    if (lower.includes("receive")) {
+        return "pending";
     }
 
     return lower;
 };
 
-const getStatusLabel = (item: Feedback) =>
-    item.statusText ||
-    statusLabels[item.status || ""] ||
-    statusLabels[normalizeStatus(item.status)] ||
-    item.status ||
-    "Đã tiếp nhận";
+const getStatusLabel = (item: Feedback) => {
+    const rawStatus = item.status || "PENDING";
+    const normalizedStatus = normalizeStatus(rawStatus);
+
+    return (
+        statusLabels[rawStatus] ||
+        statusLabels[normalizedStatus] ||
+        rawStatus ||
+        "Đã tiếp nhận"
+    );
+};
+
+const getFeedbackCategory = (item: Feedback) => {
+    return (
+        item.feedbackType?.title ||
+        item.feedbackType?.name ||
+        "Phản ánh người dân"
+    );
+};
+
+const getSenderName = (item: Feedback) => {
+    return item.senderName || "Chưa cung cấp";
+};
+
+const getSenderPhone = (item: Feedback) => {
+    return item.phone || "";
+};
+
+const getAddress = (item: Feedback) => {
+    return item.address || "Chưa có khu vực";
+};
+
+const getCreatedAt = (item: Feedback) => {
+    return item.createdAt || item.updatedAt || "";
+};
+
+const getFeedbackItems = (
+    response: PaginatedResponse<Feedback> | Feedback[] | unknown,
+): Feedback[] => {
+    if (Array.isArray(response)) {
+        return response;
+    }
+
+    if (typeof response === "object" && response !== null) {
+        const data = response as {
+            data?: Feedback[];
+            items?: Feedback[];
+            feedbacks?: Feedback[];
+        };
+
+        return data.feedbacks ?? data.items ?? data.data ?? [];
+    }
+
+    return [];
+};
 
 const matchesSearch = (item: Feedback, keyword: string) => {
     if (!keyword) {
@@ -554,10 +571,11 @@ const matchesSearch = (item: Feedback, keyword: string) => {
     const text = [
         item.title,
         item.content,
-        item.type,
-        item.receivingUnitName,
-        item.senderFullName,
-        item.senderPhone,
+        getFeedbackCategory(item),
+        item.senderName,
+        item.phone,
+        item.email,
+        item.address,
     ]
         .filter(Boolean)
         .join(" ")
@@ -568,48 +586,46 @@ const matchesSearch = (item: Feedback, keyword: string) => {
 
 const FeedbackPage: React.FC = () => {
     const navigate = useNavigate();
+
     const [keyword, setKeyword] = useState("");
-
-    const { id: organizationId } = useStore(state => state.organization) || {
-        id: "",
-    };
-
-    const [feedbacks, loading, getFeedbacks] = useStore(state => [
-        state.feedbacks,
-        state.gettingFeedback,
-        state.getFeedbacks,
-    ]);
-
+    const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const getFeedbackItems = (response: unknown): Feedback[] => {
-        if (Array.isArray(response)) {
-            return response as Feedback[];
-        }
 
-        if (typeof response === "object" && response !== null) {
-            const data = response as {
-                data?: Feedback[];
-                items?: Feedback[];
-                feedbacks?: Feedback[];
-            };
+    const loadFeedbacks = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError("");
 
-            return data.feedbacks ?? data.items ?? data.data ?? [];
-        }
-
-        return [];
-    };
-    const loadFeedbacks = useCallback(() => {
-        if (organizationId) {
-            getFeedbacks({
-                organizationId,
+            const response = await getFeedbacks({
                 page: 0,
-                firstFetch: true,
+                size: 30,
+                keyword: keyword.trim(),
             });
+
+            setFeedbacks(getFeedbackItems(response));
+        } catch (err) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : "Không thể tải danh sách phản ánh.";
+
+            setError(message);
+            setFeedbacks([]);
+        } finally {
+            setLoading(false);
         }
-    }, [getFeedbacks, organizationId]);
+    }, [keyword]);
 
     useEffect(() => {
-        loadFeedbacks();
+        const timer = window.setTimeout(() => {
+            void loadFeedbacks();
+        }, 350);
+
+        return () => {
+            window.clearTimeout(timer);
+        };
     }, [loadFeedbacks]);
 
     useEffect(() => {
@@ -620,39 +636,24 @@ const FeedbackPage: React.FC = () => {
         }
 
         return () => {
-            if (isCreateOpen) {
-                document.body.style.overflow = previousOverflow;
-            }
+            document.body.style.overflow = previousOverflow;
         };
     }, [isCreateOpen]);
 
     const visibleFeedbacks = useMemo(
-        () =>
-            getFeedbackItems(feedbacks).filter(item =>
-                matchesSearch(item, keyword.trim()),
-            ),
+        () => feedbacks.filter(item => matchesSearch(item, keyword.trim())),
         [feedbacks, keyword],
     );
+
     return (
         <PageWrapper id="feedbacks">
-            <TopHeader>
-                <HeaderRow>
-                    <BackButton
-                        aria-label="Quay lại"
-                        onClick={() => navigate("/", { direction: "backward" })}
-                        type="button"
-                    >
-                        <Icon icon="zi-arrow-left" size={23} />
-                    </BackButton>
-
-                    <HeaderContent>
-                        <HeaderTitle>Phản ánh người dân</HeaderTitle>
-                        <HeaderDescription>
-                            Theo dõi và gửi kiến nghị đến chính quyền địa phương
-                        </HeaderDescription>
-                    </HeaderContent>
-                </HeaderRow>
-            </TopHeader>
+            <AppHeader
+                back
+                fixed={false}
+                title="Phản ánh người dân"
+                description="Theo dõi và gửi kiến nghị đến chính quyền địa phương"
+                onBack={() => navigate("/", { direction: "backward" })}
+            />
 
             <Content>
                 <SearchBox>
@@ -671,73 +672,95 @@ const FeedbackPage: React.FC = () => {
                             : `${visibleFeedbacks.length} phản ánh kiến nghị`}
                     </SummaryText>
 
-                    <RefreshButton type="button" onClick={loadFeedbacks}>
-                        <Icon icon="zi-arrow-right" size={15} />
-                        Làm mới
+                    <RefreshButton
+                        type="button"
+                        onClick={loadFeedbacks}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <Spinner />
+                        ) : (
+                            <Icon icon="zi-refresh" size={15} />
+                        )}
+                        {loading ? "Đang tải..." : "Làm mới"}
                     </RefreshButton>
                 </SummaryRow>
 
-                <FeedbackList>
-                    {visibleFeedbacks.map(item => {
-                        const status = normalizeStatus(item.status);
+                {error && !loading && (
+                    <ErrorState>
+                        {error}
+                        <br />
+                        Vui lòng kiểm tra API phản ánh hoặc thử lại.
+                    </ErrorState>
+                )}
 
-                        return (
-                            <FeedbackCard
-                                key={item.id}
-                                onClick={() =>
-                                    navigate(`/feedbacks/${item.id}`)
-                                }
-                            >
-                                <CardTop>
-                                    <Code>#{String(item.id).slice(0, 8)}</Code>
+                {!error && (
+                    <FeedbackList>
+                        {visibleFeedbacks.map(item => {
+                            const status = normalizeStatus(item.status);
 
-                                    <StatusBadge $status={status}>
-                                        {getStatusLabel(item)}
-                                    </StatusBadge>
-                                </CardTop>
+                            return (
+                                <FeedbackCard
+                                    key={item.id}
+                                    onClick={() =>
+                                        navigate(`/feedbacks/${item.id}`)
+                                    }
+                                >
+                                    <CardTop>
+                                        <Code>
+                                            #{String(item.id).slice(0, 8)}
+                                        </Code>
 
-                                <Category>
-                                    {item.type || "Phản ánh người dân"}
-                                </Category>
+                                        <StatusBadge $status={status}>
+                                            {getStatusLabel(item)}
+                                        </StatusBadge>
+                                    </CardTop>
 
-                                <CardTitle>{item.title}</CardTitle>
+                                    <Category>
+                                        {getFeedbackCategory(item)}
+                                    </Category>
 
-                                <CardContent>{item.content}</CardContent>
+                                    <CardTitle>
+                                        {item.title || "Chưa có tiêu đề"}
+                                    </CardTitle>
 
-                                <Sender>
-                                    Người gửi:{" "}
-                                    {item.isAnonymous
-                                        ? "Ẩn danh"
-                                        : item.senderFullName ||
-                                          "Chưa cung cấp"}
-                                    {item.senderPhone
-                                        ? ` - ${item.senderPhone}`
-                                        : ""}
-                                </Sender>
+                                    <CardContent>
+                                        {item.content || "Chưa có nội dung"}
+                                    </CardContent>
 
-                                <Divider />
+                                    <Sender>
+                                        Người gửi: {getSenderName(item)}
+                                        {getSenderPhone(item)
+                                            ? ` - ${getSenderPhone(item)}`
+                                            : ""}
+                                    </Sender>
 
-                                <CardFoot>
-                                    <Meta>
-                                        <Icon icon="zi-location" size={14} />
-                                        {item.addressDetail ||
-                                            item.ward ||
-                                            item.district ||
-                                            item.province ||
-                                            item.senderAddress ||
-                                            "Chưa có khu vực"}
-                                    </Meta>
+                                    <Divider />
 
-                                    <Meta>
-                                        {formatDateTime(item.creationTime)}
-                                    </Meta>
-                                </CardFoot>
-                            </FeedbackCard>
-                        );
-                    })}
-                </FeedbackList>
+                                    <CardFoot>
+                                        <Meta>
+                                            <Icon
+                                                icon="zi-location"
+                                                size={14}
+                                            />
+                                            {getAddress(item)}
+                                        </Meta>
 
-                {!loading && visibleFeedbacks.length === 0 && (
+                                        <Meta>
+                                            {getCreatedAt(item)
+                                                ? formatDateTime(
+                                                      getCreatedAt(item),
+                                                  )
+                                                : "Chưa có ngày"}
+                                        </Meta>
+                                    </CardFoot>
+                                </FeedbackCard>
+                            );
+                        })}
+                    </FeedbackList>
+                )}
+
+                {!loading && !error && visibleFeedbacks.length === 0 && (
                     <EmptyState>
                         Chưa có phản ánh phù hợp.
                         <br />
@@ -764,35 +787,7 @@ const FeedbackPage: React.FC = () => {
                 </CreateButton>
             </CreateAction>
 
-            <BottomNav>
-                <NavItem onClick={() => navigate("/")} type="button">
-                    <Icon icon="zi-home" size={21} />
-                    <span>Trang chủ</span>
-                </NavItem>
-
-                <NavItem onClick={() => navigate("/news")} type="button">
-                    <Icon icon="zi-list-1" size={21} />
-                    <span>Tin tức</span>
-                </NavItem>
-
-                <NavItem $active type="button">
-                    <Icon icon="zi-chat" size={21} />
-                    <span>Cộng đồng</span>
-                </NavItem>
-
-                <NavItem
-                    onClick={() => navigate("/notifications")}
-                    type="button"
-                >
-                    <Icon icon="zi-notif" size={21} />
-                    <span>Thông báo</span>
-                </NavItem>
-
-                <NavItem onClick={() => navigate("/profile")} type="button">
-                    <Icon icon="zi-user" size={21} />
-                    <span>Tài khoản</span>
-                </NavItem>
-            </BottomNav>
+            <AppBottomNav />
 
             {isCreateOpen && (
                 <PopupOverlay
@@ -806,6 +801,7 @@ const FeedbackPage: React.FC = () => {
                         role="dialog"
                     >
                         <PopupHandle />
+
                         <PopupStickyHeader>
                             <div>
                                 <PopupTitle id="create-feedback-title">
@@ -835,7 +831,7 @@ const FeedbackPage: React.FC = () => {
                                 }
 
                                 setIsCreateOpen(false);
-                                loadFeedbacks();
+                                void loadFeedbacks();
                             }}
                         />
                     </PopupPanel>

@@ -6,15 +6,16 @@ import Thumb from "@assets/thumb.png";
 import NewsFeatured from "@assets/news-featured.jpg";
 import NewsElderly from "@assets/news-elderly.jpg";
 import NewsMeeting from "@assets/news-meeting.jpg";
-import HeaderPage from "@/components/layout/HeaderPage";
+import AppHeader from "@components/layout/AppHeader";
 import {
     getArticles,
     getArticleTypes,
     type Article as ApiArticle,
     type ArticleType,
-} from "@/service/news";
-import { getBaoMoiTayNinhArticles } from "@/service/webNews";
-import { openWebView } from "@service/zalo";
+} from "@/services/news";
+import { getBaoMoiTayNinhArticles } from "@/services/webNews";
+import { openWebView } from "@/services/zalo";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 type Category = {
     id?: string;
@@ -79,26 +80,6 @@ const NewsPageWrapper = styled(Page)`
     padding: 162px 0 28px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const BackButton = styled.button`
-    width: 48px;
-    height: 48px;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-`;
-
-const Title = styled.h1`
-    margin: 0;
-    flex: 1;
-    font-size: calc(28px * var(--app-font-scale));
-    line-height: 1.05;
-    font-weight: 950;
 `;
 
 const CategoryBar = styled.div`
@@ -322,10 +303,13 @@ const NewsPage: React.FunctionComponent = () => {
                 id: "",
                 label: "Tất cả",
             },
-            ...articleTypes.map(type => ({
-                id: type.id,
-                label: type.title,
-            })),
+            ...articleTypes
+                .filter(type => !type.group || type.group === "article")
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .map(type => ({
+                    id: type.id,
+                    label: type.title ?? type.name ?? "Tin tức",
+                })),
         ],
         [articleTypes],
     );
@@ -356,29 +340,30 @@ const NewsPage: React.FunctionComponent = () => {
             setErrorMessage("");
 
             try {
-                const [backendArticles, webArticles] = await Promise.all([
-                    getArticles({
-                        page: 0,
-                        typeId: selectedTypeId || undefined,
-                    }).catch(error => {
-                        console.error("Lá»—i láº¥y tin tá»« BE:", error);
+                const backendArticles = await getArticles({
+                    page: 0,
+                    size: 10,
+                    typeId: selectedTypeId || undefined,
+                }).catch(error => {
+                    console.error("Lỗi lấy tin từ BE:", error);
 
-                        return [];
-                    }),
-                    selectedTypeId
-                        ? Promise.resolve<ApiArticle[]>([])
-                        : getBaoMoiTayNinhArticles().catch(error => {
-                              console.error("Lá»—i láº¥y tin tá»« web:", error);
+                    return [];
+                });
+                console.log(backendArticles);
+                // Chỉ lấy tin web ở tab "Tất cả"
+                const webArticles = selectedTypeId
+                    ? []
+                    : await getBaoMoiTayNinhArticles().catch(error => {
+                          console.error("Lỗi lấy tin từ web:", error);
 
-                              return [];
-                          }),
-                ]);
+                          return [];
+                      });
 
-                if (backendArticles.length === 0 && webArticles.length === 0) {
-                    throw new Error("Không có nguồn tin nào trả dữ liệu.");
-                }
+                const mixedArticles = selectedTypeId
+                    ? backendArticles
+                    : interleaveArticles(backendArticles, webArticles);
 
-                setArticles(interleaveArticles(backendArticles, webArticles));
+                setArticles(mixedArticles);
             } catch (error) {
                 console.error("Lỗi lấy tin tức:", error);
                 setArticles([]);
@@ -418,29 +403,31 @@ const NewsPage: React.FunctionComponent = () => {
 
     return (
         <NewsPageWrapper id="news-page">
-            <HeaderPage>
-                <BackButton
-                    aria-label="Quay lại"
-                    onClick={() => navigate("/", { direction: "backward" })}
-                >
-                    <Icon icon="zi-arrow-left" size={30} />
-                </BackButton>
-
-                <Title>Tin tức</Title>
-            </HeaderPage>
-
+            <AppHeader
+                back
+                title="Tin tức"
+                description="Cập nhật tin tức, thông báo và hoạt động địa phương"
+                onBack={() => navigate("/", { direction: "backward" })}
+            />
             <CategoryBar>
                 {categories.map(category => (
                     <CategoryPill
                         key={category.id ?? category.label}
                         $active={selectedTypeId === (category.id ?? "")}
                         onClick={event => {
-                            setSelectedTypeId(category.id ?? "");
+                            const nextTypeId = category.id ?? "";
+
+                            setSelectedTypeId(nextTypeId);
 
                             event.currentTarget.scrollIntoView({
                                 behavior: "smooth",
                                 inline: "center",
                                 block: "nearest",
+                            });
+
+                            document.getElementById("news-page")?.scrollTo({
+                                top: 0,
+                                behavior: "smooth",
                             });
                         }}
                     >
@@ -538,6 +525,7 @@ const NewsPage: React.FunctionComponent = () => {
                     <Icon icon="zi-arrow-up" size={28} />
                 </FloatingButton>
             </FloatingActions>
+            <AppBottomNav />
         </NewsPageWrapper>
     );
 };

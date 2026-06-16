@@ -2,7 +2,7 @@ import { Button, ImageUpload, Input, TextArea } from "@/components";
 import { RATE_LIMIT_CODE } from "@/constants";
 import { MAX_FEEDBACK_IMAGES } from "@constants/common";
 import { AppError } from "@dts";
-import { CreateFeedbackParams } from "@service/services";
+import { CreateFeedbackParams } from "@/services/services";
 import { useStore } from "@store";
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,7 @@ import { ImageType } from "zmp-ui/image-viewer";
 import {
     createFeedback,
     getFeedbackTypes as fetchFeedbackTypes,
-} from "@/service/feedback";
+} from "@/services/feedback";
 import type { FeedbackType } from "@/types";
 import SelectFeedbackType from "./SelectFeedbackType";
 

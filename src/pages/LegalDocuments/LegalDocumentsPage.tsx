@@ -1,35 +1,12 @@
-import HeaderPage from "@/components/layout/HeaderPage";
-import React from "react";
+import AppHeader from "@components/layout/AppHeader";
+import {
+    getLegalDocuments,
+    type LegalDocument,
+} from "@/services/legal-document";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { Icon, Page, useNavigate } from "zmp-ui";
-
-type DocumentItem = {
-    title: string;
-    meta: string;
-};
-
-const documents: DocumentItem[] = [
-    {
-        title: "Giao tham mưu giải quyết đề nghị xem xét quyết định đơn vị...",
-        meta: "Chỉ đạo điều hành · 10495/UBND-CNXD...",
-    },
-    {
-        title: "Triển khai thực hiện Nghị định số 163/2026/NĐ-CP ngày...",
-        meta: "Chỉ đạo điều hành · 10493/UBND-TDNC ...",
-    },
-    {
-        title: "Giao tham mưu giải quyết đề nghị của UBND phường Đông...",
-        meta: "Chỉ đạo điều hành · 10490/UBND-CNXD...",
-    },
-    {
-        title: "Giao xem xét, giải quyết đề nghị di chuyển đường dây 35kV ph...",
-        meta: "Chỉ đạo điều hành · 10483/UBND-CNXD...",
-    },
-    {
-        title: "Giao triển khai Công văn số 8132/BXD-GĐ ngày 01/6/2026...",
-        meta: "Chỉ đạo điều hành · 10492/UBND-CNXD...",
-    },
-];
+import { Icon, Page, Spinner, useNavigate } from "zmp-ui";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 const PageWrapper = styled(Page)`
     min-height: 100vh;
@@ -45,27 +22,6 @@ const PageWrapper = styled(Page)`
     padding: 112px 0 32px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const BackButton = styled.button`
-    width: 48px;
-    height: 48px;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-`;
-
-const Title = styled.h1`
-    margin: 0;
-    flex: 1;
-    font-size: calc(26px * var(--app-font-scale));
-    line-height: 1.08;
-    font-weight: 950;
-    white-space: nowrap;
 `;
 
 const Content = styled.main`
@@ -108,6 +64,7 @@ const DocumentList = styled.div`
 
 const DocumentCard = styled.article`
     min-height: 106px;
+    border: 0;
     border-radius: 22px;
     background: #ffffff;
     display: grid;
@@ -115,7 +72,16 @@ const DocumentCard = styled.article`
     gap: 16px;
     align-items: center;
     padding: 16px;
+    width: 100%;
+    text-align: left;
     box-shadow: 0 16px 32px rgba(30, 35, 50, 0.1);
+`;
+
+const DocumentButton = styled.button`
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
 `;
 
 const DocumentIcon = styled.div`
@@ -165,6 +131,38 @@ const Arrow = styled.div`
     place-items: center;
 `;
 
+const StateBox = styled.div`
+    margin-top: 18px;
+    min-height: 160px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.78);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    color: #64748b;
+    box-shadow: 0 14px 28px rgba(30, 35, 50, 0.08);
+`;
+
+const StateText = styled.p`
+    margin: 10px 0 0;
+    font-size: calc(16px * var(--app-font-scale));
+    line-height: 1.45;
+    font-weight: 600;
+`;
+
+const RetryButton = styled.button`
+    margin-top: 14px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    padding: 0 18px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #005b9f, #008bd2);
+    font-size: calc(15px * var(--app-font-scale));
+    font-weight: 800;
+`;
+
 const FloatingActions = styled.div`
     position: fixed;
     right: max(16px, calc((100vw - 430px) / 2 + 16px));
@@ -187,54 +185,184 @@ const FloatingButton = styled.button`
     box-shadow: 0 14px 26px rgba(0, 91, 159, 0.28);
 `;
 
+function formatDate(value?: string) {
+    if (!value) {
+        return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return new Intl.DateTimeFormat("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    }).format(date);
+}
+
+function getDocumentCategory(document: LegalDocument) {
+    return (
+        document.documentCategory?.name ||
+        document.documentCategory?.title ||
+        document.category ||
+        "Văn bản pháp luật"
+    );
+}
+
+function getDocumentCode(document: LegalDocument) {
+    return document.code || document.documentNumber || "";
+}
+
+function getDocumentDate(document: LegalDocument) {
+    return formatDate(
+        document.issuedAt || document.issuedDate || document.effectiveDate,
+    );
+}
+
+function getDocumentMeta(document: LegalDocument) {
+    const parts = [
+        getDocumentCategory(document),
+        getDocumentCode(document),
+        getDocumentDate(document),
+    ].filter(Boolean);
+
+    return parts.join(" · ");
+}
+
 const LegalDocumentsPage: React.FunctionComponent = () => {
     const navigate = useNavigate();
 
+    const [documents, setDocuments] = useState<LegalDocument[]>([]);
+    const [keyword, setKeyword] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const loadDocuments = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError("");
+            const data = await getLegalDocuments({
+                page: 0,
+                size: 30,
+                keyword: keyword.trim(),
+            });
+            setDocuments(data);
+        } catch (err) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : "Không thể tải danh sách văn bản.";
+
+            setError(message);
+            setDocuments([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [keyword]);
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void loadDocuments();
+        }, 350);
+
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [loadDocuments]);
+
+    const hasDocuments = useMemo(() => documents.length > 0, [documents]);
+
     return (
         <PageWrapper id="legal-documents-page">
-            <HeaderPage>
-                <BackButton
-                    aria-label="Quay lại"
-                    onClick={() => navigate("/", { direction: "backward" })}
-                >
-                    <Icon icon="zi-arrow-left" size={28} />
-                </BackButton>
-
-                <Title>Văn bản</Title>
-            </HeaderPage>
+            <AppHeader
+                back
+                title="Văn bản pháp luật"
+                description="Tra cứu, theo dõi văn bản và chính sách mới"
+                onBack={() => navigate("/", { direction: "backward" })}
+            />
 
             <Content>
                 <SearchBox>
                     <Icon icon="zi-search" size={28} />
-                    <SearchInput placeholder="Tìm văn bản..." />
+                    <SearchInput
+                        placeholder="Tìm văn bản..."
+                        value={keyword}
+                        onChange={event => setKeyword(event.target.value)}
+                    />
                 </SearchBox>
 
-                <DocumentList>
-                    {documents.map(document => (
-                        <DocumentCard key={document.title}>
-                            <DocumentIcon>
-                                <Icon icon="zi-file" size={28} />
-                            </DocumentIcon>
-                            <DocumentBody>
-                                <DocumentTitle>{document.title}</DocumentTitle>
-                                <DocumentMeta>{document.meta}</DocumentMeta>
-                            </DocumentBody>
-                            <Arrow>
-                                <Icon icon="zi-chevron-right" size={26} />
-                            </Arrow>
-                        </DocumentCard>
-                    ))}
-                </DocumentList>
+                {loading && (
+                    <StateBox>
+                        <div>
+                            <Spinner />
+                            <StateText>Đang tải danh sách văn bản...</StateText>
+                        </div>
+                    </StateBox>
+                )}
+
+                {!loading && error && (
+                    <StateBox>
+                        <div>
+                            <Icon icon="zi-info-circle" size={34} />
+                            <StateText>{error}</StateText>
+                            <RetryButton type="button" onClick={loadDocuments}>
+                                Thử lại
+                            </RetryButton>
+                        </div>
+                    </StateBox>
+                )}
+
+                {!loading && !error && !hasDocuments && (
+                    <StateBox>
+                        <div>
+                            <Icon icon="zi-file" size={34} />
+                            <StateText>Chưa có văn bản nào.</StateText>
+                        </div>
+                    </StateBox>
+                )}
+
+                {!loading && !error && hasDocuments && (
+                    <DocumentList>
+                        {documents.map(document => (
+                            <DocumentButton
+                                key={document.id}
+                                type="button"
+                                onClick={() =>
+                                    navigate(`/legal-documents/${document.id}`)
+                                }
+                            >
+                                <DocumentCard>
+                                    <DocumentIcon>
+                                        <Icon icon="zi-file" size={28} />
+                                    </DocumentIcon>
+
+                                    <DocumentBody>
+                                        <DocumentTitle>
+                                            {document.title ||
+                                                "Chưa có tiêu đề"}
+                                        </DocumentTitle>
+                                        <DocumentMeta>
+                                            {getDocumentMeta(document)}
+                                        </DocumentMeta>
+                                    </DocumentBody>
+
+                                    <Arrow>
+                                        <Icon
+                                            icon="zi-chevron-right"
+                                            size={26}
+                                        />
+                                    </Arrow>
+                                </DocumentCard>
+                            </DocumentButton>
+                        ))}
+                    </DocumentList>
+                )}
             </Content>
 
-            <FloatingActions>
-                <FloatingButton aria-label="Mở rộng">
-                    <Icon icon="zi-arrow-up" size={28} />
-                </FloatingButton>
-                <FloatingButton aria-label="Trò chuyện">
-                    <Icon icon="zi-chat" size={31} />
-                </FloatingButton>
-            </FloatingActions>
+            <AppBottomNav />
         </PageWrapper>
     );
 };

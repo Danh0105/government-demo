@@ -15,7 +15,7 @@ import {
 } from "@components/appointment-schedule";
 import { IconButtonWithLabel } from "@components";
 import html2canvas from "@xuannghia/html2canvas";
-import { saveImage } from "@service/zalo";
+import { saveImage } from "@/services/zalo";
 import { SCHEDULE_APPOINTMENT_STATUS } from "@constants";
 
 const AppointmentScheduleResult = forwardRef<HTMLDivElement, any>(() => {

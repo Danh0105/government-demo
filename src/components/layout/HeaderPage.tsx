@@ -7,24 +7,17 @@ const HeaderPage = styled.header`
     z-index: 20;
 
     width: min(100vw, 430px);
-    height: 96px;
-    padding: calc(16px + env(safe-area-inset-top)) 14px 12px;
+    min-height: 96px;
+    padding: calc(14px + var(--zaui-safe-area-inset-top, 0px)) 16px 18px;
     box-sizing: border-box;
 
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 
     color: #ffffff;
-
-    background: radial-gradient(
-            circle at 18% 18%,
-            rgba(77, 184, 255, 0.28),
-            transparent 34%
-        ),
-        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
-
-    box-shadow: 0 10px 26px rgba(0, 50, 95, 0.24);
+    background: linear-gradient(135deg, #064f88 0%, #0075b8 100%);
+    box-shadow: 0 10px 24px rgba(0, 84, 142, 0.2);
 `;
 
 export const BackButton = styled.button`

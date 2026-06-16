@@ -7,6 +7,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import tw from "twin.macro";
 import "styled-components/macro";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 const InformationGuidePage: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
@@ -74,6 +75,7 @@ const InformationGuidePage: React.FC = () => {
                     loading={loading}
                 />
             </InfiniteScroll>
+            <AppBottomNav />
         </PageLayout>
     );
 };

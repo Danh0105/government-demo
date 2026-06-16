@@ -4,7 +4,7 @@ import {
     CreateWorkScheduleParams,
     createWorkSchedule,
     getWorkSchedule,
-} from "@service/services.mock";
+} from "@/services/services.mock";
 import { OrganizationSlice } from "./organizationSlice";
 
 export interface ScheduleSlice {

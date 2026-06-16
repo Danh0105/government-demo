@@ -5,7 +5,7 @@ import { Box, Icon, ImageViewer } from "zmp-ui";
 import { ImageType } from "zmp-ui/image-viewer";
 
 import { API, BASE_URL, MAX_FEEDBACK_IMAGES } from "@constants/common";
-import { pickImages } from "@service/zalo";
+import { pickImages } from "@/services/zalo";
 import { useStore } from "@store";
 
 export interface IUploadImageResponse {

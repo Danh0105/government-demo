@@ -6,6 +6,7 @@ import tw from "twin.macro";
 import AppButton from "@components/customized/Button";
 import { useStore } from "@store";
 import SearchResultList from "./SearchResultList";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface PropsType {}
@@ -74,6 +75,7 @@ const SearchPage: React.FC<PropsType> = () => {
                 </form>
                 <SearchResultList loading={loading} profiles={profiles} />
             </Wrapper>
+            <AppBottomNav />
         </PageLayout>
     );
 };

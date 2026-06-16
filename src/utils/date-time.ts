@@ -32,29 +32,22 @@ export const formatDate = (date: Date, format = "mm/dd/yyyy"): string => {
     });
 };
 
-export const formatDateTime = (date?: Date): string => {
-    if (!date) {
+export function formatDateTime(value?: string | Date | null) {
+    if (!value) {
         return "";
     }
-    let day: number | string = date.getDate();
-    let month: number | string = date.getMonth() + 1;
+
+    const date = value instanceof Date ? value : new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
 
-    const hh =
-        date.getHours() < 10
-            ? `0${date.getHours()}`
-            : date.getHours().toString();
-    const MM =
-        date.getMinutes() < 10
-            ? `0${date.getMinutes()}`
-            : date.getMinutes().toString();
-
-    if (day < 10) {
-        day = `0${day}`;
-    }
-    if (month < 10) {
-        month = `0${month}`;
-    }
-
-    return `${hh}:${MM} - ${day}/${month}/${year}`;
-};
+    return `${day}/${month}/${year} ${hour}:${minute}`;
+}

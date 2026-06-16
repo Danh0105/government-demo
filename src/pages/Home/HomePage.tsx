@@ -3,15 +3,43 @@ import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
 import Background from "@assets/background.png";
 import HeaderBackground from "@assets/header-background.png";
-import Thumb from "@assets/thumb.png";
-import FeedbackThumb from "@assets/feedback-thumb.png";
-import Youtube from "@assets/youtube.png";
-import SocialInsurance from "@assets/social-insurance.png";
-import CompanyLogo from "@assets/logo.png";
+import ReactMarkdown from "react-markdown";
+import { openWebView } from "@/services/zalo";
+import TOUR_TAY_NINH from "@/assets/tnbd.png";
+import QK from "@/assets/QK.png";
+import WC from "@/assets/WC.png";
+import KHXH from "@/assets/ktxh.png";
+import AppBottomNav from "@/components/layout/AppBottomNav";
+import NEWS from "@/assets/icons/documents.png";
+import DOCUMENTS from "@/assets/icons/grammar.png";
+import GOVERNMENT from "@/assets/icons/customers.png";
+import FEEDBACK from "@/assets/icons/customer-service.png";
+import OCOP from "@/assets/icons/star.png";
+import JOBS from "@/assets/icons/recruitment.png";
+import INDUSTRIAL from "@/assets/icons/manufacture.png";
+import BUISSENESS from "@/assets/icons/management.png";
+import TRAFFIC from "@/assets/icons/recruitment.png";
+import TELEVISION from "@/assets/icons/television.png";
+import destinations from "@/assets/icons/luggage.png";
+import restaurants from "@/assets/icons/restaurant.png";
+import hotels from "@/assets/icons/hotel.png";
+import transport from "@/assets/icons/moving.png";
+
+const TOUR_TAY_NINH_URL =
+    "https://www.ivivu.com/du-lich/tour-tay-ninh-1n-vieng-nui-ba-chinh-phuc-cap-treo-van-son-toa-thanh-tay-ninh/2289";
+const BAU_CU_QH_XVI_URL =
+    "https://thuvienphapluat.vn/phap-luat/huong-dan-tuyen-truyen-bau-cu-dai-bieu-quoc-hoi-khoa-xvi-va-bau-cu-dai-bieu-hoi-dong-nhan-dan-cac-c-33890-240434.html";
+const KE_HOACH_KTXH_2027_URL =
+    "https://baochinhphu.vn/thu-tuong-chinh-phu-chi-thi-xay-dung-ke-hoach-phat-trien-ktxh-va-du-toan-ngan-sach-nha-nuoc-nam-2027-102260613163355849.htm";
+const PHONG_CHONG_MA_TUY_2026_URL =
+    "https://moit.gov.vn/tin-tuc/bo-cong-thuong-ban-hanh-ke-hoach-trien-khai-thang-hanh-dong-phong-chong-ma-tuy-nam-2026.html";
+const NHIEM_VU_VP_HDND_UBND_CAP_XA_URL =
+    "https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/ho-tro-phap-luat/chinh-sach-moi/89367/tong-hop-nhiem-vu-cua-van-phong-hdnd-va-ubnd-cap-xa-tu-01-7-2025";
 
 type FeatureItem = {
     label: string;
-    icon: React.ComponentProps<typeof Icon>["icon"];
+    icon?: React.ComponentProps<typeof Icon>["icon"];
+    image?: string;
     path?: string;
 };
 
@@ -26,10 +54,20 @@ type NavItem = FeatureItem & {
     path?: string;
 };
 
+type ChatSource = {
+    id?: string;
+    title?: string;
+    label?: string;
+    url?: string;
+    updatedAt?: string;
+};
+
 type ChatMessage = {
     id: number;
     role: "assistant" | "user";
     content: string;
+    sources?: ChatSource[];
+    showSourceNotice?: boolean;
 };
 
 const featureSections: Section[] = [
@@ -37,16 +75,16 @@ const featureSections: Section[] = [
         title: "Hành chính công",
         more: "Xem thêm",
         items: [
-            { label: "Tin tức", icon: "zi-note", path: "/news" },
-            { label: "Văn bản", icon: "zi-file", path: "/legal-documents" },
+            { label: "Tin tức", image: NEWS, path: "/news" },
+            { label: "Văn bản", image: DOCUMENTS, path: "/legal-documents" },
             {
                 label: "Dịch vụ công",
-                icon: "zi-home",
+                image: GOVERNMENT,
                 path: "/public-services",
             },
             {
-                label: "Phản ánh người dân ",
-                icon: "zi-chat",
+                label: "Phản ánh người dân",
+                image: FEEDBACK,
                 path: "/feedbacks",
             },
         ],
@@ -55,96 +93,106 @@ const featureSections: Section[] = [
         title: "Kinh tế số",
         more: "Xem thêm",
         items: [
-            { label: "OCOP", icon: "zi-star", path: "/ocop" },
-            { label: "Thông tin tuyển dụng", icon: "zi-search", path: "/jobs" },
+            { label: "OCOP", image: OCOP, path: "/ocop" },
+            {
+                label: "Thông tin tuyển dụng",
+                image: JOBS,
+                path: "/jobs",
+            },
             {
                 label: "Khu công nghiệp",
-                icon: "zi-home",
+                image: INDUSTRIAL,
                 path: "/industrial-zones",
             },
-            { label: "Doanh nghiệp", icon: "zi-user", path: "/businesses" },
+            {
+                label: "Doanh nghiệp",
+                image: BUISSENESS,
+                path: "/businesses",
+            },
         ],
     },
-
     {
-        title: "Thông tin số ",
+        title: "Thông tin số",
         more: "Xem thêm",
         items: [
             {
                 label: "Tra phạt nguội",
-                icon: "zi-search",
+                image: TRAFFIC,
                 path: "/traffic-fines",
             },
-            { label: "Truyền hình", icon: "zi-video", path: "/television" },
+            {
+                label: "Truyền hình",
+                image: TELEVISION,
+                path: "/television",
+            },
         ],
     },
-
     {
         title: "Du lịch số",
         more: "Xem thêm",
         items: [
-            { label: "Du lịch", icon: "zi-location", path: "/destinations" },
-            { label: "Nhà hàng", icon: "zi-more-grid", path: "/restaurants" },
-            { label: "Khách sạn", icon: "zi-home", path: "/hotels" },
-            { label: "Di chuyển", icon: "zi-call", path: "/transport" },
+            {
+                label: "Du lịch",
+                image: destinations,
+                path: "/destinations",
+            },
+            {
+                label: "Nhà hàng",
+                image: restaurants,
+                path: "/restaurants",
+            },
+            {
+                label: "Khách sạn",
+                image: hotels,
+                path: "/hotels",
+            },
+            {
+                label: "Di chuyển",
+                image: transport,
+                path: "/transport",
+            },
         ],
     },
 ];
 
-const galleryItems = [
+/* const galleryItems = [
     { title: "Ảnh đẹp Thiệu Hóa", count: "19 ảnh", image: Background },
     { title: "Ẩm thực địa phương", count: "9 ảnh", image: Thumb },
     { title: "Sản vật quê hương", count: "8 ảnh", image: SocialInsurance },
-];
+]; */
 
 const eventItems = [
     {
         title: "LỊCH THI ĐẤU - KÊNH XEM TẠI VIỆT NAM - FIFA World Cup",
         date: "2026-06-11",
         place: "Canada, Mexico, Hoa Kỳ",
-        image: HeaderBackground,
+        image: WC,
+        url: "https://vtv.vn/chinh-thuc-lich-truc-tiep-vck-fifa-world-cup-2026-tren-vtv-100260611134549356.htm",
     },
     {
         title: "Chào mừng Ngày Quốc khánh 2/9",
         date: "2026-08-31",
         place: "Khu dân cư, trung tâm xã",
-        image: FeedbackThumb,
+        image: QK,
+        url: "https://hcmussh.edu.vn/news/item/9427",
     },
 ];
-
 const policyItems = [
-    "Triển khai thực hiện Nghị định số 163/2026/NĐ-CP...",
-    "Giao tham mưu giải quyết đề nghị của UBND phường Đông...",
+    {
+        title: "Bộ Công Thương ban hành Kế hoạch triển khai Tháng hành động phòng, chống ma túy năm 2026",
+        meta: "Chỉ đạo điều hành · 1049...",
+        date: "2026-06-03",
+        url: PHONG_CHONG_MA_TUY_2026_URL,
+    },
+    {
+        title: "Tổng hợp nhiệm vụ của Văn phòng HĐND và UBND cấp xã từ 01/7/2025",
+        meta: "Chính sách mới · Văn phòng HĐND và UBND",
+        date: "2026-06-14",
+        url: NHIEM_VU_VP_HDND_UBND_CAP_XA_URL,
+    },
 ];
 
-const navItems: NavItem[] = [
-    {
-        label: "Trang chủ",
-        icon: "zi-home",
-        active: true,
-        path: "/",
-    },
-    {
-        label: "Tin tức",
-        icon: "zi-note",
-        path: "/news",
-    },
-    {
-        label: "Cộng đồng",
-        icon: "zi-chat",
-        path: "/feedbacks",
-    },
-    {
-        label: "Thông báo",
-        icon: "zi-notif",
-        path: "/notifications",
-    },
-    {
-        label: "Tài khoản",
-        icon: "zi-user",
-        path: "/profile",
-    },
-];
+const DEFAULT_VISIBLE_FEATURE_COUNT = 4;
 
 const StyledPage = styled(Page)`
     min-height: 100vh;
@@ -498,7 +546,7 @@ const SectionTitle = styled.h2`
     color: #172033;
 `;
 
-const MoreLink = styled.button`
+const MoreLink = styled.button<{ $expanded?: boolean }>`
     border: 0;
     background: transparent;
     color: #b50b1b;
@@ -508,6 +556,13 @@ const MoreLink = styled.button`
     font-size: calc(16px * var(--app-font-scale));
     font-weight: 850;
     white-space: nowrap;
+
+    svg {
+        transform: rotate(
+            ${({ $expanded }) => ($expanded ? "-90deg" : "0deg")}
+        );
+        transition: transform 160ms ease;
+    }
 `;
 
 const FeatureGrid = styled.div`
@@ -562,7 +617,13 @@ const Medallion = styled.div`
         box-shadow: 0 4px 10px rgba(0, 86, 153, 0.1);
     }
 `;
-
+const FeatureIconImage = styled.img`
+    width: 34px;
+    height: 34px;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 7px rgba(0, 86, 153, 0.18));
+`;
 const FeatureLabel = styled.span`
     min-height: 32px;
 
@@ -831,23 +892,6 @@ const RadioCard = styled.article`
     box-shadow: 0 18px 34px rgba(30, 35, 50, 0.1);
 `;
 
-const RadioHero = styled.div`
-    height: 230px;
-    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.48)),
-        url(${FeedbackThumb}) center/cover;
-    position: relative;
-`;
-
-const RadioHeroTitle = styled.div`
-    position: absolute;
-    inset: auto 18px 20px;
-    color: #ffffff;
-    font-size: calc(20px * var(--app-font-scale));
-    line-height: 1.25;
-    font-weight: 1000;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
-`;
-
 const RadioRow = styled.div`
     display: grid;
     grid-template-columns: 58px 68px 1fr;
@@ -861,13 +905,6 @@ const RadioNumber = styled.div`
     color: #e20018;
     font-size: calc(24px * var(--app-font-scale));
     font-weight: 1000;
-`;
-
-const RadioThumb = styled.div`
-    width: 58px;
-    height: 42px;
-    border-radius: 4px;
-    background: url(${FeedbackThumb}) center/cover;
 `;
 
 const RadioTitle = styled.div`
@@ -1067,14 +1104,46 @@ const ChatBubble = styled.div<{ $role: ChatMessage["role"] }>`
     background: ${({ $role }) => ($role === "user" ? "#0063a7" : "#ffffff")};
 
     font-size: calc(14px * var(--app-font-scale));
-    line-height: 1.45;
+    line-height: 1.55;
     font-weight: 500;
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
 
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-`;
 
+    p {
+        margin: 0 0 8px;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    strong {
+        font-weight: 800;
+    }
+
+    ul,
+    ol {
+        margin: 8px 0 8px 18px;
+        padding: 0;
+    }
+
+    li {
+        margin: 4px 0;
+    }
+`;
+const SourceNotice = styled.div`
+    margin-top: 8px;
+    padding: 8px 10px;
+
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #98a2b3;
+
+    font-size: calc(12px * var(--app-font-scale));
+    line-height: 1.4;
+    font-weight: 500;
+`;
 const ChatError = styled.div`
     margin: 0 14px 10px;
 
@@ -1261,6 +1330,60 @@ const NavButton = styled.button<{ $active?: boolean }>`
         display: none;
     }
 `;
+const RadioHero = styled.div`
+    position: relative;
+    height: 170px;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 22px;
+    background: #7f1d1d;
+`;
+
+const RadioHeroImage = styled.img`
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+`;
+
+const RadioHeroOverlay = styled.div`
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(127, 29, 29, 0.15) 0%,
+        rgba(127, 29, 29, 0.82) 100%
+    );
+`;
+
+const RadioHeroTitle = styled.h3`
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 2;
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.35;
+`;
+
+const RadioThumb = styled.div`
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #fee2e2;
+
+    img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+    }
+`;
 const ICON_SIZE = {
     header: 23,
     feature: 23,
@@ -1270,9 +1393,65 @@ const ICON_SIZE = {
     floating: 25,
 } as const;
 
+const getAssistantSources = (data: any): ChatSource[] => {
+    const possibleSources =
+        data?.sources ??
+        data?.data?.sources ??
+        data?.data?.source ??
+        data?.source;
+
+    if (Array.isArray(possibleSources)) {
+        return possibleSources;
+    }
+
+    return [];
+};
+
+const hasSourceField = (data: any): boolean => {
+    return (
+        Array.isArray(data?.sources) ||
+        Array.isArray(data?.data?.sources) ||
+        Array.isArray(data?.data?.source) ||
+        Array.isArray(data?.source)
+    );
+};
+
+const removeJsonCodeFence = (value: string): string => {
+    return value
+        .trim()
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/```$/i, "")
+        .trim();
+};
+
+const tryParseJsonAnswer = (value: string): string | null => {
+    const cleanedValue = removeJsonCodeFence(value);
+
+    try {
+        const parsed = JSON.parse(cleanedValue);
+
+        if (typeof parsed?.answer === "string") {
+            return parsed.answer;
+        }
+
+        if (typeof parsed?.data?.answer === "string") {
+            return parsed.data.answer;
+        }
+
+        if (typeof parsed?.message === "string") {
+            return parsed.message;
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
+};
+
 const getAssistantAnswer = (data: any): string => {
     if (typeof data === "string") {
-        return data;
+        return tryParseJsonAnswer(data) ?? data;
     }
 
     const possibleAnswer =
@@ -1284,12 +1463,11 @@ const getAssistantAnswer = (data: any): string => {
         data?.content;
 
     if (typeof possibleAnswer === "string") {
-        return possibleAnswer;
+        return tryParseJsonAnswer(possibleAnswer) ?? possibleAnswer;
     }
 
     return "Xin lỗi, tôi chưa nhận được nội dung trả lời phù hợp.";
 };
-
 const HomePage: React.FunctionComponent = () => {
     const navigate = useNavigate();
     const [isChatOpen, setIsChatOpen] = useState(false);
@@ -1297,6 +1475,9 @@ const HomePage: React.FunctionComponent = () => {
     const [isSending, setIsSending] = useState(false);
     const [chatError, setChatError] = useState("");
     const [isCompanyLogoExpanded, setIsCompanyLogoExpanded] = useState(false);
+    const [expandedSections, setExpandedSections] = useState<
+        Record<string, boolean>
+    >({});
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             id: Date.now(),
@@ -1359,11 +1540,11 @@ const HomePage: React.FunctionComponent = () => {
         ]);
 
         const controller = new AbortController();
-        const timeoutId = window.setTimeout(() => controller.abort(), 30000);
+        const timeoutId = window.setTimeout(() => controller.abort(), 90000);
 
         try {
             const response = await fetch(
-                "https://775f-2402-800-63a6-9a61-914b-905d-b0ba-d9f9.ngrok-free.app/chat/ask",
+                "https://externally-tight-serval.ngrok-free.app/chat/ask",
                 {
                     method: "POST",
                     headers: {
@@ -1379,19 +1560,27 @@ const HomePage: React.FunctionComponent = () => {
             }
 
             const data = await response.json();
+
+            const assistantSources = getAssistantSources(data);
+            const shouldShowSourceNotice =
+                hasSourceField(data) && assistantSources.length === 0;
+
             setMessages(current => [
                 ...current,
                 {
                     id: nextMessageId(),
                     role: "assistant",
                     content: getAssistantAnswer(data),
+                    sources: assistantSources,
+                    showSourceNotice: shouldShowSourceNotice,
                 },
             ]);
         } catch (error) {
             let message = "Có lỗi xảy ra khi gửi câu hỏi.";
 
             if (error instanceof DOMException && error.name === "AbortError") {
-                message = "Trợ lý phản hồi quá lâu, vui lòng thử lại.";
+                message =
+                    "Trợ lý đang khởi động hoặc phản hồi quá lâu, vui lòng gửi lại câu hỏi.";
             } else if (error instanceof Error) {
                 message = error.message;
             }
@@ -1412,6 +1601,89 @@ const HomePage: React.FunctionComponent = () => {
         }
     };
 
+    const goToPage = (path?: string) => {
+        if (path) {
+            navigate(path);
+        }
+    };
+
+    const toggleSection = (sectionTitle: string) => {
+        setExpandedSections(current => ({
+            ...current,
+            [sectionTitle]: !current[sectionTitle],
+        }));
+    };
+
+    const getVisibleSectionItems = (section: Section) => {
+        if (expandedSections[section.title]) {
+            return section.items;
+        }
+
+        return section.items.slice(0, DEFAULT_VISIBLE_FEATURE_COUNT);
+    };
+
+    const renderSectionMoreButton = (section: Section) => {
+        const isExpanded = Boolean(expandedSections[section.title]);
+        const hasHiddenItems =
+            section.items.length > DEFAULT_VISIBLE_FEATURE_COUNT;
+
+        if (!hasHiddenItems) {
+            return null;
+        }
+
+        return (
+            <MoreLink
+                type="button"
+                $expanded={isExpanded}
+                aria-expanded={isExpanded}
+                onClick={() => toggleSection(section.title)}
+            >
+                {isExpanded ? "Thu gọn" : section.more ?? "Xem thêm"}
+                <Icon icon="zi-chevron-right" size={22} />
+            </MoreLink>
+        );
+    };
+
+    const renderFeatureSection = (section: Section) => {
+        const visibleItems = getVisibleSectionItems(section);
+
+        return (
+            <SectionBlock key={section.title}>
+                <SectionHead>
+                    <SectionTitle>{section.title}</SectionTitle>
+                    {renderSectionMoreButton(section)}
+                </SectionHead>
+                <FeatureGrid>
+                    {visibleItems.map(item => (
+                        <FeatureButton
+                            key={item.label}
+                            onClick={() => goToPage(item.path)}
+                        >
+                            <Medallion>
+                                {item.image ? (
+                                    <FeatureIconImage src={item.image} alt="" />
+                                ) : item.icon ? (
+                                    <Icon
+                                        icon={item.icon}
+                                        size={ICON_SIZE.feature}
+                                    />
+                                ) : null}
+                            </Medallion>
+                            <FeatureLabel>{item.label}</FeatureLabel>
+                        </FeatureButton>
+                    ))}
+                </FeatureGrid>
+            </SectionBlock>
+        );
+    };
+
+    const renderNavigateButton = (path?: string, label = "Xem thêm") => (
+        <MoreLink type="button" onClick={() => goToPage(path)}>
+            {label}
+            <Icon icon="zi-chevron-right" size={22} />
+        </MoreLink>
+    );
+
     return (
         <StyledPage id="home-page">
             <AppHeader>
@@ -1420,11 +1692,11 @@ const HomePage: React.FunctionComponent = () => {
                     <HeaderTitle>CÔNG DÂN SỐ</HeaderTitle>
                     <HeaderSubTitle>Xã Tân Lập - Tỉnh Tây Ninh</HeaderSubTitle>
                 </HeaderText>
-                <HeaderActions>
+                {/* <HeaderActions>
                     <SquareButton aria-label="Tìm kiếm">
                         <Icon icon="zi-search" size={28} />
                     </SquareButton>
-                </HeaderActions>
+                </HeaderActions> */}
             </AppHeader>
 
             <Content>
@@ -1459,102 +1731,56 @@ const HomePage: React.FunctionComponent = () => {
                     </Dots>
                 </Hero>
 
-                {featureSections.slice(0, 2).map(section => (
-                    <SectionBlock key={section.title}>
-                        <SectionHead>
-                            <SectionTitle>{section.title}</SectionTitle>
-                            <MoreLink>
-                                {section.more}
-                                <Icon icon="zi-chevron-right" size={22} />
-                            </MoreLink>
-                        </SectionHead>
-                        <FeatureGrid>
-                            {section.items.map(item => (
-                                <FeatureButton
-                                    key={item.label}
-                                    onClick={() =>
-                                        item.path && navigate(item.path)
-                                    }
-                                >
-                                    <Medallion>
-                                        <Icon
-                                            icon={item.icon}
-                                            size={ICON_SIZE.feature}
-                                        />
-                                    </Medallion>
-                                    <FeatureLabel>{item.label}</FeatureLabel>
-                                </FeatureButton>
-                            ))}
-                        </FeatureGrid>
-                    </SectionBlock>
-                ))}
+                {featureSections.slice(0, 2).map(renderFeatureSection)}
 
                 <BannerStrip>Tiện ích số </BannerStrip>
 
-                {featureSections.slice(2).map(section => (
-                    <SectionBlock key={section.title}>
-                        <SectionHead>
-                            <SectionTitle>{section.title}</SectionTitle>
-                            <MoreLink>
-                                {section.more}
-                                <Icon icon="zi-chevron-right" size={22} />
-                            </MoreLink>
-                        </SectionHead>
-                        <FeatureGrid>
-                            {section.items.map(item => (
-                                <FeatureButton
-                                    key={item.label}
-                                    onClick={() =>
-                                        item.path && navigate(item.path)
-                                    }
-                                >
-                                    <Medallion>
-                                        <Icon
-                                            icon={item.icon}
-                                            size={ICON_SIZE.feature}
-                                        />
-                                    </Medallion>
-                                    <FeatureLabel>{item.label}</FeatureLabel>
-                                </FeatureButton>
-                            ))}
-                        </FeatureGrid>
-                    </SectionBlock>
-                ))}
+                {featureSections.slice(2).map(renderFeatureSection)}
 
                 <SectionBlock>
                     <SectionHead>
                         <SectionTitle>Điểm đến du lịch</SectionTitle>
-                        <MoreLink
-                            onClick={() => navigate("/digital-government")}
-                        >
-                            Xem thêm
-                            <Icon icon="zi-chevron-right" size={22} />
-                        </MoreLink>
+                        {renderNavigateButton("/destinations")}
                     </SectionHead>
                 </SectionBlock>
-                <DestinationCard>
+                <DestinationCard
+                    onClick={() => openWebView(TOUR_TAY_NINH_URL)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={event => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            openWebView(TOUR_TAY_NINH_URL);
+                        }
+                    }}
+                >
                     <DestinationImage>
+                        <img
+                            src={TOUR_TAY_NINH}
+                            alt="Tour Núi Bà Đen Tây Ninh"
+                        />
                         <Badge>Du Lịch</Badge>
                     </DestinationImage>
+
                     <DestinationBody>
-                        <CardTitle>Đền thờ Lê Văn Hưu</CardTitle>
+                        <CardTitle>
+                            Tour Núi Bà Đen - Tòa Thánh Tây Ninh
+                        </CardTitle>
+
                         <MetaLine>
                             <Icon icon="zi-location" size={21} />
-                            Đền thờ Lê Văn Hưu
+                            Tây Ninh
                         </MetaLine>
                     </DestinationBody>
                 </DestinationCard>
 
-                <SectionBlock>
+                {/*   <SectionBlock>
                     <SectionHead>
                         <SectionTitle>Hình ảnh</SectionTitle>
-                        <MoreLink>
-                            Xem thêm
-                            <Icon icon="zi-chevron-right" size={22} />
-                        </MoreLink>
+                        {renderNavigateButton("/gallery")}
                     </SectionHead>
-                </SectionBlock>
-                <HorizontalScroller>
+                </SectionBlock> */}
+                {/*  <HorizontalScroller>
                     {galleryItems.map(item => (
                         <GalleryCard key={item.title}>
                             <GalleryImage $image={item.image} />
@@ -1564,33 +1790,47 @@ const HomePage: React.FunctionComponent = () => {
                             </GalleryBody>
                         </GalleryCard>
                     ))}
-                </HorizontalScroller>
+                </HorizontalScroller> */}
 
                 <SectionBlock>
                     <SectionHead>
                         <SectionTitle>Lịch sự kiện</SectionTitle>
-                        <MoreLink>
-                            Xem tất cả
-                            <Icon icon="zi-chevron-right" size={22} />
-                        </MoreLink>
+                        {renderNavigateButton("/events", "Xem tất cả")}
                     </SectionHead>
                 </SectionBlock>
                 <HorizontalScroller>
                     {eventItems.map(item => (
-                        <EventCard key={item.title}>
+                        <EventCard
+                            key={item.title}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => openWebView(item.url)}
+                            onKeyDown={event => {
+                                if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                ) {
+                                    openWebView(item.url);
+                                }
+                            }}
+                        >
                             <EventImage $image={item.image}>
                                 <Status>Sắp diễn ra</Status>
                             </EventImage>
+
                             <EventBody>
                                 <EventTitle>{item.title}</EventTitle>
+
                                 <MetaLine>
                                     <Icon icon="zi-calendar" size={20} />
                                     {item.date}
                                 </MetaLine>
+
                                 <MetaLine>
                                     <Icon icon="zi-location" size={20} />
                                     {item.place}
                                 </MetaLine>
+
                                 <MetaLine>
                                     <Icon icon="zi-user" size={20} />
                                     0/1000000 đã đăng ký
@@ -1603,47 +1843,99 @@ const HomePage: React.FunctionComponent = () => {
                 <SectionBlock>
                     <SectionHead>
                         <SectionTitle>Văn bản chính sách</SectionTitle>
-                        <MoreLink>
-                            Xem tất cả
-                            <Icon icon="zi-chevron-right" size={22} />
-                        </MoreLink>
+                        {renderNavigateButton("/legal-documents", "Xem tất cả")}
                     </SectionHead>
                 </SectionBlock>
                 <PolicyGrid>
                     {policyItems.map(item => (
-                        <PolicyCard key={item}>
+                        <PolicyCard
+                            key={item.title}
+                            onClick={() => openWebView(item.url)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={event => {
+                                if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                ) {
+                                    event.preventDefault();
+                                    openWebView(item.url);
+                                }
+                            }}
+                        >
                             <PolicyIcon>
                                 <Icon icon="zi-file" size={22} />
                             </PolicyIcon>
-                            <PolicyTitle>{item}</PolicyTitle>
+
+                            <PolicyTitle>{item.title}</PolicyTitle>
+
                             <PolicyMeta>
-                                Chỉ đạo điều hành · 1049...
+                                {item.meta}
                                 <br />
-                                2026-06-03
+                                {item.date}
                             </PolicyMeta>
                         </PolicyCard>
                     ))}
                 </PolicyGrid>
-
                 <RadioCard>
-                    <RadioHero>
+                    <RadioHero
+                        onClick={() => openWebView(KE_HOACH_KTXH_2027_URL)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={event => {
+                            if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                openWebView(KE_HOACH_KTXH_2027_URL);
+                            }
+                        }}
+                    >
+                        <RadioHeroImage
+                            src={KHXH}
+                            alt="Thủ tướng Chính phủ chỉ thị xây dựng kế hoạch phát triển KTXH và dự toán ngân sách nhà nước năm 2027"
+                        />
+
+                        <RadioHeroOverlay />
+
                         <RadioHeroTitle>
-                            Ý nghĩa chính trị cuộc bầu cử đại biểu Quốc hội khóa
-                            XVI
+                            Thủ tướng Chính phủ chỉ thị xây dựng kế hoạch phát
+                            triển KTXH và dự toán ngân sách nhà nước năm 2027
                         </RadioHeroTitle>
                     </RadioHero>
+
                     {[2, 3].map(number => (
-                        <RadioRow key={number}>
+                        <RadioRow
+                            key={number}
+                            onClick={() => openWebView(KE_HOACH_KTXH_2027_URL)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={event => {
+                                if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                ) {
+                                    event.preventDefault();
+                                    openWebView(KE_HOACH_KTXH_2027_URL);
+                                }
+                            }}
+                        >
                             <RadioNumber>
                                 {String(number).padStart(2, "0")}
                             </RadioNumber>
-                            <RadioThumb />
+
+                            <RadioThumb>
+                                <img
+                                    src={KHXH}
+                                    alt="Thủ tướng Chính phủ chỉ thị xây dựng kế hoạch phát triển KTXH"
+                                />
+                            </RadioThumb>
+
                             <div>
                                 <RadioTitle>
                                     {number === 2
-                                        ? "Chỉ thị số 28CT-TTg ngày 18-9-2025 của Thủ tướng Chính phủ"
-                                        : "Hướng dẫn về tuyên truyền cuộc bầu cử đại biểu Quốc hội khóa..."}
+                                        ? "Thủ tướng Chính phủ chỉ thị xây dựng kế hoạch phát triển KTXH"
+                                        : "Dự toán ngân sách nhà nước năm 2027"}
                                 </RadioTitle>
+
                                 <RadioDate>
                                     2026-05-{number === 2 ? "09" : "10"}{" "}
                                     00:00:00
@@ -1653,15 +1945,16 @@ const HomePage: React.FunctionComponent = () => {
                     ))}
                 </RadioCard>
 
-                <SectionBlock>
+                {/*   <SectionBlock>
                     <SectionHead>
                         <SectionTitle>Bảng điện tử</SectionTitle>
+                        {renderNavigateButton("/digital-board")}
                     </SectionHead>
-                </SectionBlock>
-                <BoardGrid>
+                </SectionBlock> */}
+                {/*   <BoardGrid>
                     <BoardImage $image={Youtube} />
                     <BoardImage $image={Thumb} />
-                </BoardGrid>
+                </BoardGrid> */}
             </Content>
 
             <FloatingActions>
@@ -1703,7 +1996,13 @@ const HomePage: React.FunctionComponent = () => {
                                     key={message.id}
                                     $role={message.role}
                                 >
-                                    {message.content}
+                                    {message.role === "assistant" ? (
+                                        <ReactMarkdown>
+                                            {message.content}
+                                        </ReactMarkdown>
+                                    ) : (
+                                        message.content
+                                    )}
                                 </ChatBubble>
                             ))}
                             {isSending && (
@@ -1745,30 +2044,7 @@ const HomePage: React.FunctionComponent = () => {
                     </ChatPanel>
                 </>
             )}
-
-            <BottomNav>
-                <BottomNavLogo
-                    aria-label="Logo công ty"
-                    $expanded={isCompanyLogoExpanded}
-                >
-                    <BottomNavLogoImage
-                        src={CompanyLogo}
-                        alt="Logo công ty"
-                        $expanded={isCompanyLogoExpanded}
-                    />
-                </BottomNavLogo>
-
-                {navItems.map(item => (
-                    <NavButton
-                        key={item.label}
-                        $active={item.active}
-                        onClick={() => item.path && navigate(item.path)}
-                    >
-                        <Icon icon={item.icon} size={ICON_SIZE.nav} />
-                        <span>{item.label}</span>
-                    </NavButton>
-                ))}
-            </BottomNav>
+            <AppBottomNav />
         </StyledPage>
     );
 };

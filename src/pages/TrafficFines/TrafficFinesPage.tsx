@@ -1,7 +1,9 @@
+import AppHeader from "@components/layout/AppHeader";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
 import { openWebview } from "zmp-sdk/apis";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 const TRAFFIC_FINE_URL = "https://csgt.bocongan.gov.vn/tra-cuu-phat-nguoi";
 
@@ -19,54 +21,6 @@ const PageWrapper = styled(Page)`
         linear-gradient(180deg, #eef7ff 0, #f7fbff 260px, #f5f7fb 100%);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const Header = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    z-index: 20;
-    width: min(100vw, 430px);
-    height: 96px;
-    padding: 24px 16px 16px;
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    transform: translateX(-50%);
-    color: #ffffff;
-    background: radial-gradient(
-            circle at 18% 18%,
-            rgba(77, 184, 255, 0.28),
-            transparent 34%
-        ),
-        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
-    box-shadow: 0 12px 30px rgba(0, 50, 95, 0.24);
-`;
-
-const BackButton = styled.button`
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.16);
-    cursor: pointer;
-`;
-
-const HeaderTitle = styled.h1`
-    flex: 1;
-    margin: 0;
-    align-self: center;
-    font-size: calc(22px * var(--app-font-scale));
-    line-height: 1.2;
-    font-weight: 900;
-`;
-
-const HeaderPlaceholder = styled.div`
-    width: 48px;
-    height: 48px;
 `;
 
 const Content = styled.main`
@@ -215,20 +169,12 @@ const TrafficFinesPage: React.FC = () => {
 
     return (
         <PageWrapper id="traffic-fines-page">
-            <Header>
-                <BackButton
-                    type="button"
-                    aria-label="Quay lại"
-                    onClick={() => navigate(-1)}
-                >
-                    <Icon icon="zi-arrow-left" size={28} />
-                </BackButton>
-
-                <HeaderTitle>Tra cứu phạt nguội</HeaderTitle>
-
-                <HeaderPlaceholder aria-hidden="true" />
-            </Header>
-
+            <AppHeader
+                back
+                title="Tra cứu phạt nguội"
+                description="Kiểm tra vi phạm giao thông theo biển số xe"
+                onBack={() => navigate(-1)}
+            />
             <Content>
                 <HeroCard>
                     <HeroIcon>
@@ -291,6 +237,7 @@ const TrafficFinesPage: React.FC = () => {
                     sát giao thông — Bộ Công an.
                 </Notice>
             </Content>
+            <AppBottomNav />
         </PageWrapper>
     );
 };

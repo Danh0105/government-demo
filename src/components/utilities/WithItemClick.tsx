@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import { openPhone } from "zmp-sdk";
-import { openWebView } from "@service/zalo";
+import { openWebView } from "@/services/zalo";
 import { useSnackbar, useNavigate } from "zmp-ui";
 
 function WithItemClick<T>(Component: ComponentType<T & object>) {

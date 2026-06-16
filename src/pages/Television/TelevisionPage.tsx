@@ -1,7 +1,9 @@
+import AppHeader from "@components/layout/AppHeader";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
 import { openWebview } from "zmp-sdk/apis";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 type TelevisionChannel = {
     id: string;
@@ -61,54 +63,6 @@ const PageWrapper = styled(Page)`
         linear-gradient(180deg, #eef7ff 0, #f7fbff 260px, #f5f7fb 100%);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const Header = styled.header`
-    position: fixed;
-    inset: 0 auto auto 50%;
-    z-index: 20;
-    width: min(100vw, 430px);
-    height: 96px;
-    padding: 24px 16px 16px;
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    color: #ffffff;
-    background: radial-gradient(
-            circle at 18% 18%,
-            rgba(77, 184, 255, 0.28),
-            transparent 34%
-        ),
-        linear-gradient(135deg, #00325f 0%, #004b86 48%, #0067ad 100%);
-    box-shadow: 0 12px 30px rgba(0, 50, 95, 0.24);
-    transform: translateX(-50%);
-`;
-
-const BackButton = styled.button`
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.16);
-    cursor: pointer;
-`;
-
-const HeaderTitle = styled.h1`
-    flex: 1;
-    align-self: center;
-    margin: 0;
-    font-size: calc(23px * var(--app-font-scale));
-    line-height: 1.2;
-    font-weight: 950;
-`;
-
-const HeaderPlaceholder = styled.div`
-    width: 48px;
-    height: 48px;
 `;
 
 const Content = styled.main`
@@ -343,20 +297,12 @@ const TelevisionPage: React.FC = () => {
 
     return (
         <PageWrapper id="television-page">
-            <Header>
-                <BackButton
-                    type="button"
-                    aria-label="Quay lại"
-                    onClick={() => navigate(-1)}
-                >
-                    <Icon icon="zi-arrow-left" size={28} />
-                </BackButton>
-
-                <HeaderTitle>Truyền hình trực tuyến</HeaderTitle>
-
-                <HeaderPlaceholder aria-hidden="true" />
-            </Header>
-
+            <AppHeader
+                back
+                title="Truyền hình trực tuyến"
+                description="Xem các kênh truyền hình, tin tức và chương trình địa phương"
+                onBack={() => navigate(-1)}
+            />
             <Content>
                 <Hero>
                     <HeroDecoration />
@@ -429,6 +375,7 @@ const TelevisionPage: React.FC = () => {
                     Nội dung được mở từ nền tảng truyền hình trực tuyến VTVgo.
                 </Notice>
             </Content>
+            <AppBottomNav />
         </PageWrapper>
     );
 };

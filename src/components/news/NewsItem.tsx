@@ -4,7 +4,7 @@ import { DateTime } from "@utils";
 import styled from "styled-components";
 import tw from "twin.macro";
 import { Article } from "@dts";
-import { openWebView } from "@service/zalo";
+import { openWebView } from "@/services/zalo";
 
 export interface NewsItemProps {
     data: Article;

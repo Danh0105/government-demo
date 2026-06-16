@@ -15,14 +15,14 @@ export type ApiResponse<T> = {
 
 export type ArticleType = {
     id: string;
-    title: string;
+    group?: string;
     name?: string;
-    description?: string;
+    title?: string;
+    description?: string | null;
     order?: number;
     createdAt?: string;
     updatedAt?: string;
 };
-
 export type Article = {
     id: string;
     title: string;
@@ -41,12 +41,22 @@ export type Article = {
 
 export type ArticleQuery = {
     page?: number;
+    size?: number;
+  
     limit?: number;
     keyword?: string;
     search?: string;
+  
     typeId?: string;
-};
-
+  };
+  function buildArticleQuery(query: ArticleQuery = {}) {
+    return buildQuery({
+      page: query.page,
+      size: query.size ?? query.limit,
+      keyword: query.keyword ?? query.search,
+      typeId: query.typeId,
+    });
+  }
 export type PaginatedResponse<T> = {
     data?: T[];
     items?: T[];
@@ -215,20 +225,20 @@ export async function getArticleType(id: string): Promise<ArticleType> {
 
 export async function getArticles(
     query: ArticleQuery = {},
-): Promise<Article[]> {
+  ): Promise<Article[]> {
     const response = await fetch(
-        `${API_BASE_URL}/articles${buildQuery(query)}`,
-        {
-            method: "GET",
-            headers: getHeaders(),
-            cache: "no-store",
-        },
+      `${API_BASE_URL}/articles${buildArticleQuery(query)}`,
+      {
+        method: "GET",
+        headers: getHeaders(),
+        cache: "no-store",
+      },
     );
-
+  
     const result = await handleResponse<unknown>(response);
-
+  
     return normalizeList<Article>(result);
-}
+  }
 
 export async function getArticle(id: string): Promise<Article> {
     const response = await fetch(`${API_BASE_URL}/articles/${id}`, {

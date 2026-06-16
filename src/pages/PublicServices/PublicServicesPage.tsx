@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { Icon, Page, useNavigate } from "zmp-ui";
-import { openWebView } from "@service/zalo";
-import HeaderPage from "@/components/layout/HeaderPage";
+import { openWebView } from "@/services/zalo";
+import AppHeader from "@components/layout/AppHeader";
+import AppBottomNav from "@/components/layout/AppBottomNav";
 
 const NATIONAL_PORTAL_URL = "https://dichvucong.gov.vn";
 
@@ -61,26 +62,6 @@ const PageWrapper = styled(Page)`
     padding: 112px 0 32px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-`;
-
-const BackButton = styled.button`
-    width: 48px;
-    height: 48px;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-`;
-
-const Title = styled.h1`
-    margin: 0;
-    flex: 1;
-    font-size: calc(24px * var(--app-font-scale));
-    line-height: 1.08;
-    font-weight: 950;
 `;
 
 const Content = styled.main`
@@ -282,16 +263,12 @@ const PublicServicesPage: React.FunctionComponent = () => {
     };
     return (
         <PageWrapper id="public-services-page">
-            <HeaderPage>
-                <BackButton
-                    aria-label="Quay lại"
-                    onClick={() => navigate("/", { direction: "backward" })}
-                >
-                    <Icon icon="zi-arrow-left" size={28} />
-                </BackButton>
-
-                <Title>Dịch vụ công</Title>
-            </HeaderPage>
+            <AppHeader
+                back
+                title="Dịch vụ công"
+                description="Tra cứu và thực hiện thủ tục hành chính trực tuyến"
+                onBack={() => navigate("/", { direction: "backward" })}
+            />
 
             <Content>
                 <HeroCard>
@@ -354,6 +331,7 @@ const PublicServicesPage: React.FunctionComponent = () => {
                     Quốc gia để thực hiện thủ tục.
                 </NoteCard>
             </Content>
+            <AppBottomNav />
         </PageWrapper>
     );
 };

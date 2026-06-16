@@ -2,7 +2,7 @@ import { InformationGuides } from "@dts";
 import {
     getInformationGuides,
     GetInformationGuidesParams,
-} from "@service/services.mock";
+} from "@/services/services.mock";
 import { StateCreator } from "zustand";
 
 export interface InformationGuideSlice {
