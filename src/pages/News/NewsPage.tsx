@@ -67,6 +67,11 @@ function interleaveArticles(
 }
 
 const NewsPageWrapper = styled(Page)`
+    --news-shell-width: min(100vw, 430px);
+    --news-header-offset: calc(70px + var(--zaui-safe-area-inset-top, 0px));
+    --news-category-height: 66px;
+    --news-scrollbar-gutter: 10px;
+
     min-height: 100vh;
     max-width: 430px;
     margin: 0 auto;
@@ -77,19 +82,28 @@ const NewsPageWrapper = styled(Page)`
         ),
         linear-gradient(180deg, #eef7ff 0, #f7fbff 238px, #f5f7fb 100%);
     color: #172033;
-    padding: 162px 0 28px;
+    padding: calc(
+            var(--news-header-offset) + var(--news-category-height)
+        )
+        0 calc(28px + var(--zaui-safe-area-inset-bottom, 0px));
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
+
+    @media (max-width: 410px) {
+        --news-category-height: 58px;
+    }
 `;
 
 const CategoryBar = styled.div`
     position: fixed;
-    top: 96px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: var(--news-header-offset);
+    right: max(
+        var(--news-scrollbar-gutter),
+        calc((100vw - 430px) / 2)
+    );
+    left: max(0px, calc((100vw - 430px) / 2));
     z-index: 11;
-    width: min(100vw, 430px);
-    height: 66px;
+    height: var(--news-category-height);
     background: rgba(255, 255, 255, 0.86);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(0, 95, 168, 0.1);
@@ -110,6 +124,11 @@ const CategoryBar = styled.div`
 
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    @media (max-width: 410px) {
+        gap: 8px;
+        padding: 8px 10px 10px;
     }
 `;
 
@@ -133,12 +152,23 @@ const CategoryPill = styled.button<{ $active?: boolean }>`
             ? "0 12px 24px rgba(0, 91, 159, 0.24)"
             : "0 8px 20px rgba(30, 35, 50, 0.08)"};
 
-    font-size: calc(18px * var(--app-font-scale));
-    font-weight: 850;
+    font-size: calc(17px * var(--app-font-scale));
+    font-weight: 900;
+
+    @media (max-width: 410px) {
+        border-radius: 14px;
+        padding: 0 14px;
+        font-size: calc(15px * var(--app-font-scale));
+    }
 `;
 
 const Content = styled.main`
-    padding: 0 12px 98px;
+    padding: 0 12px calc(118px + var(--zaui-safe-area-inset-bottom, 0px));
+
+    @media (max-width: 410px) {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
 `;
 
 const FeaturedCard = styled.article`
@@ -147,10 +177,14 @@ const FeaturedCard = styled.article`
     overflow: hidden;
     box-shadow: 0 18px 36px rgba(30, 35, 50, 0.12);
     cursor: pointer;
+
+    @media (max-width: 410px) {
+        border-radius: 20px;
+    }
 `;
 
 const FeaturedImage = styled.div<{ $image: string }>`
-    height: 234px;
+    height: clamp(196px, 55vw, 234px);
     background: linear-gradient(
             180deg,
             rgba(23, 32, 51, 0.02),
@@ -161,6 +195,10 @@ const FeaturedImage = styled.div<{ $image: string }>`
 
 const FeaturedBody = styled.div`
     padding: 20px 18px 22px;
+
+    @media (max-width: 410px) {
+        padding: 16px 14px 18px;
+    }
 `;
 
 const Chip = styled.span`
@@ -171,34 +209,54 @@ const Chip = styled.span`
     padding: 0 14px;
     background: rgba(230, 247, 255, 0.92);
     color: #00558f;
-    font-size: calc(15px * var(--app-font-scale));
-    font-weight: 850;
+    font-size: calc(14px * var(--app-font-scale));
+    font-weight: 900;
+
+    @media (max-width: 410px) {
+        height: 30px;
+        padding: 0 12px;
+        font-size: calc(13px * var(--app-font-scale));
+    }
 `;
 
 const FeaturedTitle = styled.h2`
     margin: 14px 0 12px;
-    font-size: calc(26px * var(--app-font-scale));
+    font-size: calc(24px * var(--app-font-scale));
     line-height: 1.22;
-    font-weight: 950;
+    font-weight: 900;
     color: #172033;
+
+    @media (max-width: 410px) {
+        margin: 12px 0 10px;
+        font-size: calc(21px * var(--app-font-scale));
+    }
 `;
 
 const Excerpt = styled.p`
     margin: 0;
     color: #707987;
-    font-size: calc(19px * var(--app-font-scale));
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.45;
+    font-weight: 650;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    @media (max-width: 410px) {
+        font-size: calc(16px * var(--app-font-scale));
+    }
 `;
 
 const Meta = styled.p`
     margin: 10px 0 0;
     color: #87909f;
-    font-size: calc(15px * var(--app-font-scale));
-    font-weight: 700;
+    font-size: calc(14px * var(--app-font-scale));
+    font-weight: 750;
+
+    @media (max-width: 410px) {
+        font-size: calc(13px * var(--app-font-scale));
+    }
 `;
 
 const ArticleList = styled.div`
@@ -209,7 +267,7 @@ const ArticleList = styled.div`
 
 const ArticleCard = styled.article`
     display: grid;
-    grid-template-columns: 142px 1fr;
+    grid-template-columns: minmax(120px, 36%) 1fr;
     gap: 14px;
     min-height: 156px;
     border-radius: 22px;
@@ -217,9 +275,18 @@ const ArticleCard = styled.article`
     padding: 14px;
     box-shadow: 0 16px 32px rgba(30, 35, 50, 0.1);
     cursor: pointer;
+
+    @media (max-width: 410px) {
+        grid-template-columns: 112px 1fr;
+        gap: 10px;
+        min-height: 132px;
+        border-radius: 18px;
+        padding: 10px;
+    }
 `;
 
 const ArticleImage = styled.div<{ $image: string }>`
+    min-height: 128px;
     border-radius: 17px;
     background: linear-gradient(
             180deg,
@@ -227,6 +294,11 @@ const ArticleImage = styled.div<{ $image: string }>`
             rgba(23, 32, 51, 0.08)
         ),
         url(${({ $image }) => $image}) center/cover;
+
+    @media (max-width: 410px) {
+        min-height: 112px;
+        border-radius: 14px;
+    }
 `;
 
 const ArticleBody = styled.div`
@@ -239,17 +311,28 @@ const ArticleBody = styled.div`
 const ArticleTitle = styled.h3`
     margin: 10px 0 10px;
     color: #172033;
-    font-size: calc(21px * var(--app-font-scale));
+    font-size: calc(19px * var(--app-font-scale));
     line-height: 1.28;
-    font-weight: 950;
+    font-weight: 900;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    @media (max-width: 410px) {
+        margin: 8px 0 6px;
+        font-size: calc(16px * var(--app-font-scale));
+        line-height: 1.24;
+    }
 `;
 
 const ArticleExcerpt = styled(Excerpt)`
-    font-size: calc(17px * var(--app-font-scale));
+    font-size: calc(15px * var(--app-font-scale));
+
+    @media (max-width: 410px) {
+        -webkit-line-clamp: 1;
+        font-size: calc(14px * var(--app-font-scale));
+    }
 `;
 
 const StateBox = styled.div`
@@ -269,11 +352,15 @@ const StateBox = styled.div`
 const FloatingActions = styled.div`
     position: fixed;
     right: max(16px, calc((100vw - 430px) / 2 + 16px));
-    bottom: 28px;
+    bottom: calc(86px + var(--zaui-safe-area-inset-bottom, 0px));
     z-index: 12;
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    @media (max-width: 410px) {
+        right: 12px;
+    }
 `;
 
 const FloatingButton = styled.button`
@@ -286,6 +373,11 @@ const FloatingButton = styled.button`
     color: #ffffff;
     background: linear-gradient(135deg, #005b9f, #008bd2);
     box-shadow: 0 14px 26px rgba(0, 91, 159, 0.28);
+
+    @media (max-width: 410px) {
+        width: 50px;
+        height: 50px;
+    }
 `;
 
 const NewsPage: React.FunctionComponent = () => {

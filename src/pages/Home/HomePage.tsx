@@ -212,8 +212,8 @@ const StyledPage = styled(Page)`
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         Helvetica, Arial, sans-serif;
 
-    font-size: calc(15px * var(--app-font-scale));
-    font-weight: 400;
+    font-size: calc(16px * var(--app-font-scale));
+    font-weight: 550;
     line-height: 1.5;
 
     -webkit-font-smoothing: antialiased;
@@ -299,9 +299,9 @@ const HeaderText = styled.div`
 `;
 
 const HeaderTitle = styled.div`
-    font-size: calc(20px * var(--app-font-scale));
+    font-size: calc(21px * var(--app-font-scale));
     line-height: 1.15;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.2px;
     white-space: nowrap;
 `;
@@ -309,9 +309,9 @@ const HeaderTitle = styled.div`
 const HeaderSubTitle = styled.div`
     margin-top: 5px;
 
-    font-size: calc(13px * var(--app-font-scale));
+    font-size: calc(14px * var(--app-font-scale));
     line-height: 1.3;
-    font-weight: 500;
+    font-weight: 700;
 
     color: rgba(255, 255, 255, 0.78);
     white-space: nowrap;
@@ -359,56 +359,50 @@ const Hero = styled.section`
     overflow: hidden;
 
     width: auto;
-    min-height: 210px;
-    height: clamp(220px, 58vw, 270px);
+    min-height: 230px;
+    height: clamp(235px, 62vw, 285px);
 
-    margin: clamp(10px, 3vw, 14px) clamp(10px, 3vw, 12px) 10px;
-    border-radius: clamp(18px, 5vw, 24px);
+    margin: 6px 8px 8px;
+    border-radius: 18px;
 
-    background: linear-gradient(
-            110deg,
-            rgba(0, 42, 82, 0.96) 0%,
-            rgba(0, 79, 142, 0.84) 48%,
-            rgba(0, 145, 210, 0.5) 100%
-        ),
-        url(${HeaderBackground});
+    background-image: url(${HeaderBackground});
+    background-size: 112% auto;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color: #d9ecf8;
 
-    background-size: cover;
-    background-position: center;
-
-    box-shadow: 0 16px 30px rgba(0, 75, 134, 0.18),
+    box-shadow: 0 10px 22px rgba(0, 75, 134, 0.14),
         inset 0 1px 0 rgba(255, 255, 255, 0.18);
 
     &::after {
         content: "";
         position: absolute;
         inset: 0;
-
         background: linear-gradient(
             180deg,
-            rgba(0, 36, 68, 0.04) 0%,
-            rgba(0, 36, 68, 0.08) 48%,
-            rgba(0, 36, 68, 0.5) 100%
+            rgba(0, 36, 68, 0.01) 0%,
+            rgba(0, 36, 68, 0.03) 55%,
+            rgba(0, 36, 68, 0.12) 100%
         );
-
         pointer-events: none;
     }
 
     @media (max-width: 360px) {
-        min-height: 208px;
-        height: 220px;
-        border-radius: 18px;
-
-        background-position: center;
+        min-height: 220px;
+        height: 230px;
+        margin: 5px 7px 8px;
+        border-radius: 16px;
+        background-size: 116% auto;
     }
 
     @media (min-width: 431px) {
-        height: 270px;
-        margin-left: 14px;
-        margin-right: 14px;
+        height: 290px;
+        margin-left: 8px;
+        margin-right: 8px;
+        border-radius: 20px;
+        background-size: 110% auto;
     }
 `;
-
 const HeroInner = styled.div`
     position: absolute;
     inset: 0;
@@ -431,9 +425,9 @@ const HeroCopy = styled.div`
 const Script = styled.div`
     color: #ffe08a;
 
-    font-size: clamp(18px, 5.2vw, 24px);
+    font-size: clamp(19px, 5.2vw, 24px);
     line-height: 1.15;
-    font-weight: 750;
+    font-weight: 850;
     font-style: italic;
 `;
 
@@ -442,9 +436,9 @@ const HeroTitle = styled.div`
 
     color: #ffffff;
 
-    font-size: clamp(18px, 5.4vw, 25px);
+    font-size: clamp(19px, 5.4vw, 25px);
     line-height: 1.08;
-    font-weight: 850;
+    font-weight: 950;
     letter-spacing: -0.3px;
 `;
 
@@ -459,9 +453,9 @@ const HeroMeta = styled.div`
     color: #00558f;
     background: rgba(230, 247, 255, 0.92);
 
-    font-size: clamp(9px, 2.7vw, 11px);
+    font-size: clamp(10px, 2.7vw, 12px);
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 850;
 
     white-space: nowrap;
 `;
@@ -554,7 +548,7 @@ const MoreLink = styled.button<{ $expanded?: boolean }>`
     align-items: center;
     gap: 4px;
     font-size: calc(16px * var(--app-font-scale));
-    font-weight: 850;
+    font-weight: 900;
     white-space: nowrap;
 
     svg {
@@ -633,9 +627,9 @@ const FeatureLabel = styled.span`
 
     color: #344054;
 
-    font-size: calc(13px * var(--app-font-scale));
-    line-height: 1.25;
-    font-weight: 650;
+    font-size: calc(14px * var(--app-font-scale));
+    line-height: 1.22;
+    font-weight: 800;
     letter-spacing: -0.05px;
 
     text-align: center;
@@ -665,9 +659,9 @@ const BannerStrip = styled.div`
 
     color: #ffffff;
 
-    font-size: calc(19px * var(--app-font-scale));
+    font-size: calc(20px * var(--app-font-scale));
     line-height: 1.2;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.3px;
     text-transform: uppercase;
 
@@ -701,7 +695,7 @@ const Badge = styled.span`
     background: rgba(255, 255, 255, 0.86);
     padding: 8px 14px;
     font-size: calc(14px * var(--app-font-scale));
-    font-weight: 800;
+    font-weight: 900;
     color: #475467;
 `;
 
@@ -714,9 +708,9 @@ const CardTitle = styled.h3`
 
     color: #182230;
 
-    font-size: calc(19px * var(--app-font-scale));
+    font-size: calc(20px * var(--app-font-scale));
     line-height: 1.35;
-    font-weight: 750;
+    font-weight: 850;
     letter-spacing: -0.15px;
 `;
 
@@ -731,7 +725,7 @@ const MetaLine = styled.div`
 
     font-size: calc(14px * var(--app-font-scale));
     line-height: 1.4;
-    font-weight: 450;
+    font-weight: 650;
 `;
 
 const HorizontalScroller = styled.div`
@@ -829,9 +823,9 @@ const EventTitle = styled.h3`
 
     color: #1d2939;
 
-    font-size: calc(16px * var(--app-font-scale));
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.4;
-    font-weight: 720;
+    font-weight: 850;
 
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -868,9 +862,9 @@ const PolicyIcon = styled.div`
 const PolicyTitle = styled.div`
     color: #27364b;
 
-    font-size: calc(15px * var(--app-font-scale));
+    font-size: calc(16px * var(--app-font-scale));
     line-height: 1.45;
-    font-weight: 700;
+    font-weight: 850;
 `;
 
 const PolicyMeta = styled.div`
@@ -880,7 +874,7 @@ const PolicyMeta = styled.div`
 
     font-size: calc(13px * var(--app-font-scale));
     line-height: 1.5;
-    font-weight: 450;
+    font-weight: 650;
 `;
 
 const RadioCard = styled.article`
@@ -910,9 +904,9 @@ const RadioNumber = styled.div`
 const RadioTitle = styled.div`
     color: #26364d;
 
-    font-size: calc(14px * var(--app-font-scale));
+    font-size: calc(15px * var(--app-font-scale));
     line-height: 1.4;
-    font-weight: 700;
+    font-weight: 850;
 `;
 
 const RadioDate = styled.div`
@@ -920,9 +914,9 @@ const RadioDate = styled.div`
 
     color: #7b8494;
 
-    font-size: calc(12px * var(--app-font-scale));
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1.35;
-    font-weight: 500;
+    font-weight: 650;
 `;
 
 const BoardGrid = styled.div`
@@ -958,9 +952,9 @@ const AssistantLabel = styled.span`
     color: #005b9f;
     background: rgba(255, 255, 255, 0.94);
 
-    font-size: calc(12px * var(--app-font-scale));
+    font-size: calc(13px * var(--app-font-scale));
     line-height: 1;
-    font-weight: 700;
+    font-weight: 850;
 
     box-shadow: 0 8px 18px rgba(30, 35, 50, 0.1);
 `;
@@ -1364,8 +1358,8 @@ const RadioHeroTitle = styled.h3`
     z-index: 2;
     margin: 0;
     color: #fff;
-    font-size: 18px;
-    font-weight: 800;
+    font-size: calc(19px * var(--app-font-scale));
+    font-weight: 900;
     line-height: 1.35;
 `;
 
@@ -1690,7 +1684,7 @@ const HomePage: React.FunctionComponent = () => {
                 <HeaderLogo aria-label="Công dân số" />
                 <HeaderText>
                     <HeaderTitle>CÔNG DÂN SỐ</HeaderTitle>
-                    <HeaderSubTitle>Xã Tân Lập - Tỉnh Tây Ninh</HeaderSubTitle>
+                    <HeaderSubTitle>Xã Gò Dầu - Tỉnh Tây Ninh</HeaderSubTitle>
                 </HeaderText>
                 {/* <HeaderActions>
                     <SquareButton aria-label="Tìm kiếm">
@@ -1701,30 +1695,7 @@ const HomePage: React.FunctionComponent = () => {
 
             <Content>
                 <Hero>
-                    <HeroInner>
-                        <HeroCopy>
-                            <Script>Chào mừng</Script>
-                            <HeroTitle>
-                                QUÝ CÔNG DÂN
-                                <br />
-                                THAM GIA ỨNG DỤNG
-                                <br />
-                                CÔNG DÂN SỐ
-                            </HeroTitle>
-                            <HeroMeta>
-                                Văn minh - Hiện đại - Phát triển
-                            </HeroMeta>
-                        </HeroCopy>
-                        <PhonePreview>
-                            <PhoneTop />
-                            <PhoneImage />
-                            <PhoneGrid>
-                                {Array.from({ length: 9 }).map((_, index) => (
-                                    <PhoneDot key={index} />
-                                ))}
-                            </PhoneGrid>
-                        </PhonePreview>
-                    </HeroInner>
+                    <HeroInner></HeroInner>
                     <Dots>
                         <Dot />
                         <Dot $active />

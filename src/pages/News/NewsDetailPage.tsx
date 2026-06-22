@@ -56,13 +56,19 @@ const DetailPageWrapper = styled(Page)`
     margin: 0 auto;
     background: linear-gradient(180deg, #eef7ff 0, #f7fbff 240px, #f5f7fb 100%);
     color: #172033;
-    padding: 96px 0 34px;
+    padding: calc(96px + var(--zaui-safe-area-inset-top, 0px)) 0
+        calc(34px + var(--zaui-safe-area-inset-bottom, 0px));
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
 `;
 
 const Content = styled.main`
-    padding: 0 12px 110px;
+    padding: 0 12px calc(118px + var(--zaui-safe-area-inset-bottom, 0px));
+
+    @media (max-width: 410px) {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
 `;
 
 const ArticleCard = styled.article`
@@ -70,10 +76,14 @@ const ArticleCard = styled.article`
     background: #ffffff;
     overflow: hidden;
     box-shadow: 0 18px 36px rgba(30, 35, 50, 0.12);
+
+    @media (max-width: 410px) {
+        border-radius: 20px;
+    }
 `;
 
 const Cover = styled.div<{ $image: string }>`
-    height: 246px;
+    height: clamp(206px, 58vw, 246px);
     background: linear-gradient(
             180deg,
             rgba(23, 32, 51, 0.02),
@@ -84,6 +94,10 @@ const Cover = styled.div<{ $image: string }>`
 
 const Body = styled.div`
     padding: 22px 18px 24px;
+
+    @media (max-width: 410px) {
+        padding: 18px 14px 20px;
+    }
 `;
 
 const Chip = styled.span`
@@ -94,16 +108,27 @@ const Chip = styled.span`
     padding: 0 14px;
     background: rgba(230, 247, 255, 0.92);
     color: #00558f;
-    font-size: calc(15px * var(--app-font-scale));
-    font-weight: 850;
+    font-size: calc(14px * var(--app-font-scale));
+    font-weight: 900;
+
+    @media (max-width: 410px) {
+        height: 30px;
+        padding: 0 12px;
+        font-size: calc(13px * var(--app-font-scale));
+    }
 `;
 
 const ArticleTitle = styled.h2`
     margin: 16px 0 12px;
     color: #172033;
-    font-size: calc(28px * var(--app-font-scale));
+    font-size: calc(25px * var(--app-font-scale));
     line-height: 1.22;
-    font-weight: 950;
+    font-weight: 900;
+
+    @media (max-width: 410px) {
+        margin: 14px 0 10px;
+        font-size: calc(22px * var(--app-font-scale));
+    }
 `;
 
 const Meta = styled.div`
@@ -111,17 +136,29 @@ const Meta = styled.div`
     flex-wrap: wrap;
     gap: 8px 14px;
     color: #7a8494;
-    font-size: calc(15px * var(--app-font-scale));
+    font-size: calc(14px * var(--app-font-scale));
     font-weight: 750;
     margin-bottom: 18px;
+
+    @media (max-width: 410px) {
+        gap: 6px 10px;
+        font-size: calc(13px * var(--app-font-scale));
+        margin-bottom: 14px;
+    }
 `;
 
 const Description = styled.p`
     margin: 0;
     color: #3f4a5d;
-    font-size: calc(19px * var(--app-font-scale));
+    font-size: calc(17px * var(--app-font-scale));
     line-height: 1.58;
+    font-weight: 650;
     white-space: pre-line;
+
+    @media (max-width: 410px) {
+        font-size: calc(16px * var(--app-font-scale));
+        line-height: 1.55;
+    }
 `;
 
 const ActionRow = styled.div`
@@ -129,6 +166,11 @@ const ActionRow = styled.div`
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-top: 22px;
+
+    @media (max-width: 410px) {
+        gap: 10px;
+        margin-top: 18px;
+    }
 `;
 
 const ActionButton = styled.button<{ $active?: boolean }>`
@@ -144,8 +186,14 @@ const ActionButton = styled.button<{ $active?: boolean }>`
         $active
             ? "linear-gradient(135deg, #005b9f, #008bd2)"
             : "rgba(230, 247, 255, 0.95)"};
-    font-size: calc(16px * var(--app-font-scale));
+    font-size: calc(15px * var(--app-font-scale));
     font-weight: 900;
+
+    @media (max-width: 410px) {
+        height: 46px;
+        border-radius: 14px;
+        font-size: calc(14px * var(--app-font-scale));
+    }
 `;
 
 const LinkButton = styled.a`
@@ -159,8 +207,14 @@ const LinkButton = styled.a`
     text-decoration: none;
     color: #ffffff;
     background: linear-gradient(135deg, #005b9f, #008bd2);
-    font-size: calc(17px * var(--app-font-scale));
+    font-size: calc(16px * var(--app-font-scale));
     font-weight: 900;
+
+    @media (max-width: 410px) {
+        height: 48px;
+        border-radius: 14px;
+        font-size: calc(15px * var(--app-font-scale));
+    }
 `;
 
 const StateBox = styled.div`
