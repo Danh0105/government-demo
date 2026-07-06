@@ -5,7 +5,7 @@ import { Icon, Page, useNavigate } from "zmp-ui";
 import { openWebview } from "zmp-sdk/apis";
 import AppBottomNav from "@/components/layout/AppBottomNav";
 
-const TRAFFIC_FINE_URL = "https://csgt.bocongan.gov.vn/tra-cuu-phat-nguoi";
+const TRAFFIC_FINE_URL = "https://checkphatnguoi.com.vn/";
 
 const PageWrapper = styled(Page)`
     min-height: 100vh;

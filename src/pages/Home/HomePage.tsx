@@ -1684,7 +1684,9 @@ const HomePage: React.FunctionComponent = () => {
                 <HeaderLogo aria-label="Công dân số" />
                 <HeaderText>
                     <HeaderTitle>CÔNG DÂN SỐ</HeaderTitle>
-                    <HeaderSubTitle>Xã Gò Dầu - Tỉnh Tây Ninh</HeaderSubTitle>
+                    <HeaderSubTitle>
+                        Phường Gò Dầu - Tỉnh Tây Ninh
+                    </HeaderSubTitle>
                 </HeaderText>
                 {/* <HeaderActions>
                     <SquareButton aria-label="Tìm kiếm">
